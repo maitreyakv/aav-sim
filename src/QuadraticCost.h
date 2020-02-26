@@ -10,6 +10,19 @@
 
 #include "Cost.h"
 
+/**
+ * Implementation of quadratic cost function.
+ *
+ * Quadratic cost functions are the simplest that can be used in methods like DDP because they are very easy to
+ * minimize. These are of the form
+ *
+ *      Terminal Cost: phi = 0.5 * (x_f - x_star)^T * Q_f * (x_f - x_star)
+ *
+ *      Transition Cost: L =  0.5 * u^T * R * u * dt
+ *
+ * The transition cost is multiplied by the algorithm time-step, since the cost is being applied during the entire
+ * transition of the state given the state-action pair (x,u).
+ */
 class QuadraticCost : public Cost {
 
 private:
