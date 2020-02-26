@@ -35,6 +35,7 @@ private:
 public:
     /**
      * Constructor using member-list initialization
+     *
      * @param Q_f Matrix of weights used in quadratic terminal cost
      * @param R Matrix of weights used in the quadratic transition cost, with only control cos
      */
