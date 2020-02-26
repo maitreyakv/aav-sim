@@ -26,7 +26,7 @@
  */
 class Dynamics {
 
-private:
+public:
     /**
      * Abstract method to compute the state derivative dxdt = F(x,u) of the Dynamics
      *
@@ -35,7 +35,7 @@ private:
      * @param t The time to evaluate F(x,u) at, if it is explicit in time, i.e. if dx/dt = F(x,u,t)
      * @return Vector containing the state derivative dx/dt = F(x,u)
      */
-    virtual arma::vec F(arma::vec x, arma::vec u, double t);
+    virtual arma::vec F(arma::vec x, arma::vec u, double t) = 0;
 
     /**
      * Abstract method to compute the gradient of the state derivative F_x of the Dynamics with respect to the state,
@@ -51,7 +51,7 @@ private:
      * @param dt The discretized time step in the DDP algorithm, t(k+1) - t(k)
      * @return Vector containing Phi
      */
-    virtual arma::vec Phi(arma::vec x, arma::vec u, double dt);
+    virtual arma::vec Phi(arma::vec x, arma::vec u, double dt) = 0;
 
     /**
      * Abstract method to compute the gradient of the state derivative F_x of the Dynamics with respect to the control,
@@ -67,7 +67,7 @@ private:
      * @param dt The discretized time step in the DDP algorithm, t(k+1) - t(k)
      * @return Vector containing Beta
      */
-    virtual arma::vec Beta(arma::vec x, arma::vec u, double dt);
+    virtual arma::vec Beta(arma::vec x, arma::vec u, double dt) = 0;
 };
 
 
