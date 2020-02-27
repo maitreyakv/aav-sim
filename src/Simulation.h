@@ -18,13 +18,17 @@ class Simulation {
 
 private:
     // System to be simulated
-    System m_system;
+    System* m_system_ptr;
 
 public:
     /**
-     * Constructor for a Simulation.
+     * Constructor for a Simulation that uses member-list initialization
+     *
+     * @param system_ptr Pointer to the System being simulated
      */
-    Simulation();
+    Simulation(System* system_ptr)
+        : m_system_ptr(system_ptr)
+    {}
 
     /**
      * Executes the simulation process by integrating the dynamics of the system while computing and using the optimal

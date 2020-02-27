@@ -24,16 +24,27 @@
 class System {
 
 private:
-    // Dynamics of the System
-    Dynamics* m_Dynamics;
+    // Pointer to Dynamics of the System
+    Dynamics* m_dynamics_ptr;
 
-    // Controller of the System
-    Controller* m_Controller;
+    // Pointer to Controller of the System
+    Controller* m_controller_ptr;
 
     // Current control input being used
     arma::vec u;
 
 public:
+    /**
+     * Constructor of the System class that uses member-list initialization
+     *
+     * @param dynamics_ptr Pointer to the Dynamics of the System
+     * @param controller_ptr Pointer to the Controller being used by the System
+     */
+    System(Dynamics* dynamics_ptr, Controller* controller_ptr)
+        : m_dynamics_ptr(dynamics_ptr),
+          m_controller_ptr(controller_ptr)
+    {}
+
     /**
      * Overload the () operator using the equations of motion for the purpose of using "odeint" to perform the
      * integration of the equations of motion. The system of the simulation is of the form
