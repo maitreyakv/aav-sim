@@ -107,15 +107,6 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
         }
     }
 
-    // TEMP: TESTING BY PRINTING TRAJECTORY, DELETE LATER
-    for (int k = 0; k < this->m_num_discretization; k++) {
-        std::cout << u[k](0) << ": ";
-        for (int i = 0; i < 4; i++) {
-            std::cout << x_new[k](i) << ", ";
-        }
-        std::cout << std::endl;
-    }
-
     // Return the first control input in the optimal control sequence
     return u[0];
 }
