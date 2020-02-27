@@ -68,6 +68,20 @@ public:
      * @return Vector containing Beta
      */
     virtual arma::vec Beta(arma::vec x, arma::vec u, double dt) = 0;
+
+    /**
+     * Gets the dimensionality (size) of the state vector for the Dynamics
+     *
+     * @return The size of the state vector
+     */
+    virtual int getStateDimension() = 0;
+
+    /**
+     * Gets the dimensionality (size) of the control vector for the Dynamics
+     *
+     * @return The size of the control vector
+     */
+    virtual int getControlDimension() = 0;
 };
 
 

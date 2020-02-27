@@ -43,7 +43,10 @@ public:
     System(Dynamics* dynamics_ptr, Controller* controller_ptr)
         : m_dynamics_ptr(dynamics_ptr),
           m_controller_ptr(controller_ptr)
-    {}
+    {
+        // Initialize the control to the zero vector
+        this->u = arma::zeros<arma::vec>(this->m_dynamics_ptr->getControlDimension());
+    }
 
     /**
      * Overload the () operator using the equations of motion for the purpose of using "odeint" to perform the

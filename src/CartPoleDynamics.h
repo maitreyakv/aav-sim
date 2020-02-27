@@ -89,6 +89,24 @@ public:
      * @return Vector containing Beta
      */
     arma::vec Beta(arma::vec x, arma::vec u, double dt) = 0;
+
+    /**
+     * Returns the number of elements (dimensionality) of the state vector, which is 4 for this system:
+     *
+     *  x = [z, z_dot, theta, theta_dot]^T
+     *
+     * @return 4
+     */
+    int getStateDimension() {return 4;}
+
+    /**
+     * Returns the number of elements (dimensionality) of the control vector, which is 1 for this system:
+     *
+     *  u = [u]
+     *
+     * @return 1
+     */
+    int getControlDimension() {return 1;}
 };
 
 
