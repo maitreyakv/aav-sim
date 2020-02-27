@@ -9,6 +9,9 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(Armadillo REQUIRED)
 include_directories(${ARMADILLO_INCLUDE_DIRS})
 
+find_package(Boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+
 add_executable(mpcsim main.cpp src/Simulation.cpp src/Simulation.h src/System.cpp src/System.h src/Dynamics.h src/Controller.h src/Cost.h src/QuadraticCost.cpp src/QuadraticCost.h src/CartPoleDynamics.cpp src/CartPoleDynamics.h src/DDPController.cpp src/DDPController.h)
 
 target_link_libraries(mpcsim ${ARMADILLO_LIBRARIES})
