@@ -17,7 +17,7 @@ int main() {
     DDPController* ddp_controller_ptr = new DDPController(cart_pole_dynamics_ptr,quadratic_cost_ptr, 200, 100, 0.1);
 
     arma::vec x_0;
-    x_0 << 0.0 << arma::endr << 0.0 << arma::endr << 0.1 << arma::endr << 0.0 << arma::endr;
+    x_0 << 0.0 << arma::endr << 0.0 << arma::endr << 0.0 << arma::endr << 0.0 << arma::endr;
 
     arma::vec x_star;
     x_star << 0.0 << arma::endr << 0.0 << arma::endr << pi << arma::endr << 0.0 << arma::endr;
