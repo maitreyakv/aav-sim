@@ -20,7 +20,7 @@
  */
 class Controller {
 
-private:
+protected:
     // Pointer to Dynamics of the System being controlled
     Dynamics* m_dynamics_ptr;
 
