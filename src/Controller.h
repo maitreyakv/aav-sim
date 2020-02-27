@@ -21,13 +21,24 @@
 class Controller {
 
 private:
-    // Dynamics of the System being controlled
-    Dynamics m_dynamics;
+    // Pointer to Dynamics of the System being controlled
+    Dynamics* m_dynamics_ptr;
 
-    // Cost functions that were defined to tune the Controller
-    Cost m_cost;
+    // Pointer to Cost functions that were defined to tune the Controller
+    Cost* m_cost_ptr;
 
 public:
+    /**
+     * Constructor for the Dynamics class that uses member-list initialization
+     *
+     * @param dynamics_ptr Pointer to the instance of a subclass of Dynamics that represents the dynamics of the system
+     * @param cost_ptr Pointer to the instance of a subclass of Cost that represents the cost functions
+     */
+    Controller(Dynamics* dynamics_ptr, Cost* cost_ptr)
+        : m_dynamics_ptr(dynamics_ptr),
+          m_cost_ptr(cost_ptr)
+    {}
+
     /**
      * Abstract method to compute the optimal control input of the System at the current state of the System. Whatever
      * method is used to determine this, which will implement a class that inherits from this one, will implement this
