@@ -37,6 +37,9 @@ private:
     // Mass of the pole
     double m_mass_pole;
 
+    // Total mass of the cart and pole
+    double m_mass_total;
+
     // Length of the pole;
     double m_length_pole;
 
@@ -52,7 +55,10 @@ public:
         : m_mass_cart(mass_cart),
           m_mass_pole(mass_pole),
           m_length_pole(length_pole)
-    {}
+    {
+        // Compute the total mass of the cart and the pole
+        this->m_mass_total = mass_cart + mass_pole;
+    }
 
     /**
      * Computes the state derivative dxdt = F(x,u) of the Dynamics
