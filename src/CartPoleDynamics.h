@@ -73,9 +73,9 @@ public:
      * @param x Vector with the state "x" to evaluate F_x(x,u) at
      * @param u Vector with the control input "u" to evaluate F_x(x,u) at
      * @param dt The discretized time step in the DDP algorithm, t(k+1) - t(k)
-     * @return Vector containing Phi
+     * @return Matrix containing Phi
      */
-    arma::vec Phi(arma::vec x, arma::vec u, double dt) = 0;
+    arma::mat Phi(arma::vec x, arma::vec u, double dt);
 
     /**
      * Computes the gradient of the state derivative F_x of the Dynamics with respect to the control,
@@ -86,9 +86,9 @@ public:
      * @param x Vector with the state "x" to evaluate F_x(x,u) at
      * @param u Vector with the control input "u" to evaluate F_x(x,u) at
      * @param dt The discretized time step in the DDP algorithm, t(k+1) - t(k)
-     * @return Vector containing Beta
+     * @return Matrix containing Beta
      */
-    arma::vec Beta(arma::vec x, arma::vec u, double dt) = 0;
+    arma::mat Beta(arma::vec x, arma::vec u, double dt);
 
     /**
      * Returns the number of elements (dimensionality) of the state vector, which is 4 for this system:

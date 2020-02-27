@@ -29,13 +29,13 @@ arma::vec CartPoleDynamics::F(arma::vec x, arma::vec u, double t) {
     return dxdt;
 }
 
-arma::vec CartPoleDynamics::Phi(arma::vec x, arma::vec u, double dt) {
+arma::mat CartPoleDynamics::Phi(arma::vec x, arma::vec u, double dt) {
     // Compute sine and cosine of pendulum angle theta, for use in multiple places
     double sin_theta = sin( x(2) );
     double cos_theta = cos( x(2) );
 
     // Allocate a vector for the gradient of F with respect to the state
-    arma::vec F_x = arma::zeros<arma::mat>(x.n_elem, x.n_elem);
+    arma::mat F_x = arma::zeros<arma::mat>(x.n_elem, x.n_elem);
 
     // Compute terms in the matrix Jacobian matrix
     F_x(0,1) = 1.0;
@@ -61,13 +61,13 @@ arma::vec CartPoleDynamics::Phi(arma::vec x, arma::vec u, double dt) {
     return arma::eye<arma::mat>(x.n_elem, x.n_elem) + F_x * dt;
 }
 
-arma::vec CartPoleDynamics::Beta(arma::vec x, arma::vec u, double dt) {
+arma::mat CartPoleDynamics::Beta(arma::vec x, arma::vec u, double dt) {
     // Compute sine and cosine of pendulum angle theta, for use in multiple places
     double sin_theta = sin( x(2) );
     double cos_theta = cos( x(2) );
 
     // Allocate a vector for the gradient of F with respect to the control
-    arma::vec F_u = arma::zeros<arma::vec>(x.n_elem);
+    arma::mat F_u = arma::zeros<arma::vec>(x.n_elem, 1);
 
     // Compute and add the components of the gradient to the vector
     F_u(1) = 1.0 / ( this->m_mass_cart + this->m_mass_pole * pow(sin_theta, 2) );
