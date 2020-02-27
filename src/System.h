@@ -31,7 +31,7 @@ private:
     Controller* m_controller_ptr;
 
     // Current control input being used
-    arma::vec u;
+    arma::vec m_u;
 
 public:
     /**
@@ -45,7 +45,7 @@ public:
           m_controller_ptr(controller_ptr)
     {
         // Initialize the control to the zero vector
-        this->u = arma::zeros<arma::vec>(this->m_dynamics_ptr->getControlDimension());
+        this->m_u = arma::zeros<arma::vec>(this->m_dynamics_ptr->getControlDimension());
     }
 
     /**
@@ -62,14 +62,25 @@ public:
      * @param dxdt Address of a vector where the calculated state derivative will be placed in memory
      * @param t The time at which the state derivative will be evaluated, if the dynamics are explicit in time
      */
-    void operator()  (const arma::vec& x , arma::vec& dxdt , const double t);
+    void operator() (const arma::vec& x , arma::vec& dxdt , const double t);
 
     /**
      * Uses the Controller to recompute the best control input given the current state of the system. This process
      * is repeated with some frequency during the simulation, which what the MPC method does, i.e. continually recompute
      * the optimal trajectory with a moving time horizon as the system evolves, in order to account for disturbances.
+     *
+     * @param x Current state of the System, computed from Simulation using integration technique (Euler, RK45, etc.)
+     * @param x_star Target state of the System with which to design the control to achieve
+     * @param t Current time of the System in the Simulation
+     * @param horizon The time horizon within which to compute the optimal control
      */
-    void updateControl();
+    void updateControl(arma::vec x, arma::vec x_star, double t, double horizon);
+
+    /** Getter method for the control input that is currently being used
+     *
+     * @return Vector with current control
+     */
+    arma::vec getControl() {return this->m_u;}
 };
 
 

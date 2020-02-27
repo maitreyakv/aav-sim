@@ -20,14 +20,36 @@ private:
     // System to be simulated
     System* m_system_ptr;
 
+    // Time between MPC iterations
+    double m_mpc_time_step;
+
+    // Current state of the System in the Simulation
+    arma::vec m_x;
+
+    // Current time of the Simulation
+    double m_t;
+
+    // Target state of the Simulation
+    arma::vec m_x_star;
+
+    // Time horizon length of the control optimization process
+    double m_horizon;
+
 public:
     /**
      * Constructor for a Simulation that uses member-list initialization
      *
      * @param system_ptr Pointer to the System being simulated
+     * @param mpc_time_step The time between MPC iterations
+     * @param x_0 Vector with initial state of the System
+     * @param x_star Vector with the target state of the System
      */
-    Simulation(System* system_ptr)
-        : m_system_ptr(system_ptr)
+    Simulation(System* system_ptr, double mpc_time_step, arma::vec x_0, arma::vec x_star, double horizon)
+        : m_system_ptr(system_ptr),
+          m_mpc_time_step(mpc_time_step),
+          m_x(x_0),
+          m_x_star(x_star),
+          m_horizon(horizon)
     {}
 
     /**
