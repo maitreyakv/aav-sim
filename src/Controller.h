@@ -29,7 +29,7 @@ protected:
 
 public:
     /**
-     * Constructor for the Dynamics class that uses member-list initialization
+     * Constructor for the Controller class that uses member-list initialization
      *
      * @param dynamics_ptr Pointer to the instance of a subclass of Dynamics that represents the dynamics of the system
      * @param cost_ptr Pointer to the instance of a subclass of Cost that represents the cost functions
@@ -43,9 +43,14 @@ public:
      * Abstract method to compute the optimal control input of the System at the current state of the System. Whatever
      * method is used to determine this, which will implement a class that inherits from this one, will implement this
      * method using its own algorithm, i.e. DDP or PMP.
-     * @return Vector with the optimal (or locally optimal) control input for the system at the current state
+     *
+     * @param x_0 Initial state of the time horizon, which is the current state of the System
+     * @param t_0 Initial time of the time horizon, which is the current time of the System
+     * @param x_star Target state to attempt to reach in the horizon
+     * @param t_f Final time of the time horizon, which is t_0 + length of the time horizon
+     * @return Vector containing the optimal control to implement at this step in MPC
      */
-    virtual arma::vec computeOptimalControl();
+    virtual arma::vec computeOptimalControl(arma::vec x_0, double t_0, arma::vec x_star, double t_f) = 0;
 };
 
 
