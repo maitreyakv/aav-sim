@@ -1,0 +1,54 @@
+/*
+ * Copyright (C) 2020 Maitreya Venkataswamy - All Rights Reserved
+ */
+
+#include "QuadcopterDynamics.h"
+
+arma::vec QuadcopterDynamics::F(arma::vec x, arma::vec u, double t) {
+    // Common subexpressions
+    @SUBEXPR
+
+    // Compute linear acceleration components
+    double X_ddot = @X_DDOT
+    double Y_ddot = @Y_DDOT
+    double Z_ddot = @Z_DDOT
+
+    // Compute orientation angle "acceleration" components
+    double phi_ddot = @PHI_DDOT
+    double theta_ddot = @THETA_DDOT
+    double psi_ddot = @PSI_DDOT
+
+    // Allocate vector for the state derivative
+    arma::vec dxdt = {x[3], x[4], x[5], X_ddot, Y_ddot, Z_ddot, x[9], x[10], x[11], phi_ddot, theta_ddot, psi_ddot};
+
+    // Return the state derivative
+    return dxdt;
+}
+
+arma::mat QuadcopterDynamics::Phi(arma::vec x, arma::vec u, double dt) {
+    // Common subexpressions
+    @SUBEXPR
+
+    // Allocate matrix for Jacobian with respect to the state
+    arma::mat F_x = arma::zeros<arma::mat>(x.n_elem, x.n_elem);
+
+    // Compute components of Jacobian
+    @JACOBIAN
+
+    // Transform the Jacobian into Phi and return
+    return arma::eye<arma::mat>(x.n_elem, x.n_elem) + F_x * dt;
+}
+
+arma::mat QuadcopterDynamics::Beta(arma::vec x, arma::vec u, double dt) {
+    // Common subexpressions
+    @SUBEXPR
+
+    // Allocate matrix for Jacobian with respect to the control
+    arma::mat F_u = arma::zeros<arma::mat>(x.n_elem, u.n_elem);
+
+    // Compute components of Jacobian
+    @JACOBIAN
+
+    // Transform the Jacobian into Beta and return
+    return F_u * dt;
+}
