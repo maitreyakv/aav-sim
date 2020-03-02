@@ -89,8 +89,6 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
         for (int k = 0; k < this->m_num_discretization; k++) {
             J = J + this->m_cost_ptr->L(x[k], u[k], dt);
         }
-        // TEMP
-        //std::cout << J << std::endl;
 
         // Compute the value function, its gradient and Hessian of the last state using the terminal cost
         V.back() = this->m_cost_ptr->phi(x.back(), x_star);
@@ -120,17 +118,6 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
             V_xx[k] = Q_xx[k] - Q_xu[k] * arma::solve(Q_uu[k], Q_ux[k]);
         }
     }
-
-    /**
-    // TEMP: PRINTING OUTPUT FOR TESTING
-    for (int k = 0; k < m_num_discretization; k++) {
-        std::cout << k*dt << "," << u[k][0] << "," << u[k][1] << "," << u[k][2] << "," << u[k][3];
-        for (int i = 0; i < 12; i++) {
-            std::cout << "," << x[k][i];
-        }
-        std::cout << std::endl;
-    }
-     */
 
     // Return the first control input in the optimal control sequence
     return u[0];
