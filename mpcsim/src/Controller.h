@@ -27,16 +27,21 @@ protected:
     // Pointer to Cost functions that were defined to tune the Controller
     Cost* m_cost_ptr;
 
+    // Maximum control magnitude
+    arma::vec m_u_max;
+
 public:
     /**
      * Constructor for the Controller class that uses member-list initialization
      *
      * @param dynamics_ptr Pointer to the instance of a subclass of Dynamics that represents the dynamics of the system
      * @param cost_ptr Pointer to the instance of a subclass of Cost that represents the cost functions
+     * @param u_max Vector with the maximum magnitude of the control inputs
      */
-    Controller(Dynamics* dynamics_ptr, Cost* cost_ptr)
+    Controller(Dynamics* dynamics_ptr, Cost* cost_ptr, arma::vec u_max)
         : m_dynamics_ptr(dynamics_ptr),
-          m_cost_ptr(cost_ptr)
+          m_cost_ptr(cost_ptr),
+          m_u_max(u_max)
     {}
 
     /**

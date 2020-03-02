@@ -45,13 +45,14 @@ public:
      *
      * @param dynamics_ptr Pointer to the Dynamics object used by the System using this Controller
      * @param cost_ptr Pointer to the Cost object used by this Controller
+     * @param u_max Vector with the maximum control magnitudes
      * @param num_discretization Number of discretizations of the time horizon in the DDP algorithm
      * @param num_iteration Number of iterations (forward-backward-passes) used by the algorithm
      * @param learning_rate Learning rate to use when updating the control each iteration
      */
-    DDPController(Dynamics* dynamics_ptr, Cost* cost_ptr, int num_discretization, int num_iteration,
+    DDPController(Dynamics* dynamics_ptr, Cost* cost_ptr, arma::vec u_max, int num_discretization, int num_iteration,
                   double learning_rate)
-        : Controller(dynamics_ptr, cost_ptr),
+        : Controller(dynamics_ptr, cost_ptr, u_max),
           m_num_discretization(num_discretization),
           m_num_iteration(num_iteration),
           m_learning_rate(learning_rate)

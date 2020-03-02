@@ -29,9 +29,13 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
     // Allocate sequence for the control
     std::vector<arma::vec> u;
 
-    // Initialize control with zeros
+    // Initialize control with random control
     for (int k = 0; k < this->m_num_discretization; k++) {
-        u.push_back(arma::zeros<arma::vec>(dim_u));
+        u.push_back({rand() / (double) RAND_MAX,
+                     rand() / (double) RAND_MAX,
+                     rand() / (double) RAND_MAX,
+                     rand() / (double) RAND_MAX});
+        u[k] = 2.0 * this->m_u_max % u[k] - this->m_u_max;
     }
 
     // Allocate sequences for value function and its gradient and Hessian
@@ -67,6 +71,8 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
                 du_ff = - arma::solve(Q_uu[k], Q_u[k]);
                 du_fb = - arma::solve(Q_uu[k], Q_ux[k]) * (x_new[k] - x[k]);
 
+                // TODO: Implement control clamping
+
                 // Update control using correction terms scaled by the learning rate
                 u[k] = u[k] + this->m_learning_rate * (du_ff + du_fb);
 
@@ -77,6 +83,14 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
 
         // Copy the new trajectory into the old trajectory for the purpose of comparing trajectories between iterations
         x = x_new;
+
+        // Compute total cost of trajectory
+        double J = this->m_cost_ptr->phi(x.back(), x_star);
+        for (int k = 0; k < this->m_num_discretization; k++) {
+            J = J + this->m_cost_ptr->L(x[k], u[k], dt);
+        }
+        // TEMP
+        //std::cout << J << std::endl;
 
         // Compute the value function, its gradient and Hessian of the last state using the terminal cost
         V.back() = this->m_cost_ptr->phi(x.back(), x_star);
@@ -106,6 +120,17 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
             V_xx[k] = Q_xx[k] - Q_xu[k] * arma::solve(Q_uu[k], Q_ux[k]);
         }
     }
+
+    /**
+    // TEMP: PRINTING OUTPUT FOR TESTING
+    for (int k = 0; k < m_num_discretization; k++) {
+        std::cout << k*dt << "," << u[k][0] << "," << u[k][1] << "," << u[k][2] << "," << u[k][3];
+        for (int i = 0; i < 12; i++) {
+            std::cout << "," << x[k][i];
+        }
+        std::cout << std::endl;
+    }
+     */
 
     // Return the first control input in the optimal control sequence
     return u[0];

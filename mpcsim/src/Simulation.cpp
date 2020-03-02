@@ -29,8 +29,16 @@ void Simulation::simulate(double time) {
 
     // Perform the simulation by updating the control and integrating the system
     while (this->m_t < time) {
-        // TEMP: Temporary output for post-processing, will be replaced with proper file IO
-        std::cout << this->m_t << "," << this->m_system_ptr->getControl()[0] << "," << this->m_x[0] << "," << this->m_x[2] << std::endl;
+
+
+        // TEMP: output for post-processing, will be replaced with proper file IO
+        arma::vec u = this->m_system_ptr->getControl();
+        std::cout << this->m_t << "," << u[0] << "," << u[1] << "," << u[2] << "," << u[3];
+        for (int i = 0; i < 12; i++) {
+            std::cout << "," << this->m_x[i];
+        }
+        std::cout << std::endl;
+
 
         // If the time horizon stretches beyond the final time, then shrink it such that it doesn't
         if (this->m_t + horizon > time) {

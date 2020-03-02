@@ -6,7 +6,7 @@
 #define MPCSIM_QUADCOPTERDYNAMICS_H
 
 
-#include "Dynamics.h"
+#include "../../mpcsim/src/Dynamics.h"
 
 
 class QuadcopterDynamics : public Dynamics {
@@ -23,9 +23,6 @@ private:
 
     // Gain of the motor-propeller, multiplied square of angular speed to get thrust
     double m_k;
-
-    // Product of k and l
-    double m_kl;
 
     // Friction parameter of the motors
     double m_b;
@@ -45,10 +42,7 @@ public:
           m_I_xx(I_xx),
           m_I_yy(I_yy),
           m_I_zz(I_zz)
-    {
-        // Compute product of k and l
-        this->m_kl = k * l;
-    }
+    {}
 
     /**
      * Computes the state derivative dxdt = F(x,u) of the Dynamics

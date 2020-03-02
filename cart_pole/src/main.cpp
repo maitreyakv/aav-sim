@@ -1,8 +1,8 @@
 #include <iostream>
-#include "src/CartPoleDynamics.h"
-#include "src/DDPController.h"
-#include "src/QuadraticCost.h"
-#include "src/Simulation.h"
+#include "CartPoleDynamics.h"
+#include "../../src/DDPController.h"
+#include "../../src/QuadraticCost.h"
+#include "../../src/Simulation.h"
 
 const double pi = atan(1.0) * 4.0;
 

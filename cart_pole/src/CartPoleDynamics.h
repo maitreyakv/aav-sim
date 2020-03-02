@@ -6,7 +6,7 @@
 #define MPCSIM_CARTPOLEDYNAMICS_H
 
 
-#include "Dynamics.h"
+#include "../../src/Dynamics.h"
 
 /**
  * Implements the equations of motion of a Cart-Pole system.
