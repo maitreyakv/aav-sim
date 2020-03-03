@@ -1,55 +1,84 @@
+/*
+ * Copyright (C) 2020 Maitreya Venkataswamy - All Rights Reserved
+ */
+
 #include <iostream>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include "QuadcopterDynamics.h"
 #include "../../mpcsim/src/DDPController.h"
 #include "../../mpcsim/src/QuadraticCost.h"
 #include "../../mpcsim/src/Simulation.h"
 
-const double pi = atan(1.0) * 4.0;
+arma::vec genVectorFromInputOption(boost::property_tree::ptree inputs, std::string option) {
+    std::string str = inputs.get<std::string>(option);
+    std::vector<std::string> str_split;
+    boost::split(str_split , str, boost::is_any_of(","));
+
+    arma::vec vector = arma::zeros<arma::vec>( str_split.size() );
+
+    for (long unsigned int i = 0; i < str_split.size(); i++) {
+        vector(i) = stod(str_split[i]);
+    }
+
+    return vector;
+}
+
+arma::mat genDiagonalMatrixFromInputOption(boost::property_tree::ptree inputs, std::string option) {
+    std::string str = inputs.get<std::string>(option);
+    std::vector<std::string> str_split;
+    boost::split(str_split , str, boost::is_any_of(","));
+
+    arma::mat matrix = arma::zeros<arma::mat>( str_split.size(), str_split.size() );
+
+    for (long unsigned int i = 0; i < str_split.size(); i++) {
+        matrix(i,i) = stod(str_split[i]);
+    }
+
+    return matrix;
+}
 
 int main() {
 
-    double m = 0.468;
-    double g = 9.81;
-    double l = 0.225;
-    double k = 0.00000298;
-    double b = 0.000000114;
-    double I_xx = 0.004856;
-    double I_yy = 0.004856;
-    double I_zz = 0.008801;
+    boost::property_tree::ptree inputs;
+    boost::property_tree::ini_parser::read_ini("example_input.ini", inputs);
+
+    double m    = stod( inputs.get<std::string>("QuadcopterParameters.m")    );
+    double g    = stod( inputs.get<std::string>("QuadcopterParameters.g")    );
+    double l    = stod( inputs.get<std::string>("QuadcopterParameters.l")    );
+    double k    = stod( inputs.get<std::string>("QuadcopterParameters.k")    );
+    double b    = stod( inputs.get<std::string>("QuadcopterParameters.b")    );
+    double I_xx = stod( inputs.get<std::string>("QuadcopterParameters.I_xx") );
+    double I_yy = stod( inputs.get<std::string>("QuadcopterParameters.I_yy") );
+    double I_zz = stod( inputs.get<std::string>("QuadcopterParameters.I_zz") );
 
     QuadcopterDynamics* quadcopter_dynamics_ptr = new QuadcopterDynamics(m, g, l, k, b, I_xx, I_yy, I_zz);
 
-    arma::vec x = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    arma::vec x_star = {1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    arma::vec x_0 = genVectorFromInputOption(inputs, "SimulationParameters.x_0");
 
-/**
-    double dt = 0.01;
+    arma::vec x_star = genVectorFromInputOption(inputs, "SimulationParameters.x_star");
 
-    arma::vec u = {1.0, 1.0, 1.0, 1.0};
-
-    for (int k = 0; k < 1000; k++) {
-        x = x + quadcopter_dynamics_ptr->F(x, u, k*dt) * dt;
-        std::cout << k*dt << "," << u[0] << "," << u[1] << "," << u[2] << "," << u[3];
-        for (int i = 0; i < 12; i++) {
-            std::cout << "," << x[i];
-        }
-        std::cout << std::endl;
-    }
-*/
-
-    arma::mat Q_f = 10.0 * arma::eye<arma::mat>(12, 12);
-    arma::mat R = 0.01 * arma::eye<arma::mat>(4, 4);
+    arma::mat Q_f = genDiagonalMatrixFromInputOption(inputs, "CostFunctionParameters.Q_f");
+    arma::mat R = genDiagonalMatrixFromInputOption(inputs, "CostFunctionParameters.R");
     QuadraticCost* quadratic_cost_ptr = new QuadraticCost(Q_f, R);
 
-    arma::vec u_max = pow(10, 1) * arma::ones<arma::vec>(4);
+    arma::vec u_max = stod( inputs.get<std::string>("QuadcopterParameters.u_max") ) * arma::ones<arma::vec>(4);
 
-    DDPController* ddp_controller_ptr = new DDPController(quadcopter_dynamics_ptr, quadratic_cost_ptr, u_max, 100, 50, 0.5);
+    DDPController* ddp_controller_ptr = new DDPController( quadcopter_dynamics_ptr, quadratic_cost_ptr, u_max,
+        stod( inputs.get<std::string>("ControllerParameters.num_iterations") ),
+        stod( inputs.get<std::string>("ControllerParameters.num_discretizations") ),
+        stod( inputs.get<std::string>("ControllerParameters.learning_rate") ) );
 
     System* system_ptr = new System(quadcopter_dynamics_ptr, ddp_controller_ptr);
 
-    Simulation* simulation_ptr = new Simulation(system_ptr, 0.02, x, x_star, 2.0);
+    Simulation* simulation_ptr = new Simulation(system_ptr,
+        1.0 / stod( inputs.get<std::string>("SimulationParameters.mpc_rate") ),
+        x_0, x_star, stod( inputs.get<std::string>("SimulationParameters.horizon") ));
 
-    simulation_ptr->simulate(5.0);
+    simulation_ptr->simulate( stod( inputs.get<std::string>("SimulationParameters.sim_time") ) );
 
     return 0;
 }
