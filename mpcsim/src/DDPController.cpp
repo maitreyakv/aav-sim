@@ -29,13 +29,13 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
     // Allocate sequence for the control
     std::vector<arma::vec> u;
 
-    // Initialize control with random control
+    // Initialize control with random control no more than 10% of maximum allowable control
     for (int k = 0; k < this->m_num_discretization; k++) {
         u.push_back({rand() / (double) RAND_MAX,
                      rand() / (double) RAND_MAX,
                      rand() / (double) RAND_MAX,
                      rand() / (double) RAND_MAX});
-        u[k] = 2.0 * this->m_u_max % u[k] - this->m_u_max;
+        u[k] = 0.1 * (2.0 * this->m_u_max % u[k] - this->m_u_max);
     }
 
     // Allocate sequences for value function and its gradient and Hessian
@@ -55,6 +55,14 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
     for (int k = 0; k < this->m_num_discretization - 1; k++) {
         // Integrate state using Euler integration scheme
         x_new[k+1] = x_new[k] + this->m_dynamics_ptr->F(x_new[k], u[k], t[k]) * dt;
+
+#ifdef DEBUG
+        for (int i = 0; i < dim_x; i++) {
+            if (std::isnan(x_new[k+1](i))) {
+                std::cout << "error: DDP initialized trajectory contains NaN\n"; exit(-1);
+            }
+        }
+#endif
     }
 
     // Allocate vectors for the feed-back and feed-forward terms in the control update
@@ -71,7 +79,10 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
                 du_ff = - arma::solve(Q_uu[k], Q_u[k]);
                 du_fb = - arma::solve(Q_uu[k], Q_ux[k]) * (x_new[k] - x[k]);
 
-                // TODO: Implement control clamping
+                // Limit feed-forward component of control update using simple clamping
+                for (int m = 0; m < dim_u; m++) {
+                    du_ff(m) = fmin( this->m_u_max(m), fmax(-this->m_u_max(m), du_ff(m) + u[k](m)) ) - u[k](m);
+                }
 
                 // Update control using correction terms scaled by the learning rate
                 u[k] = u[k] + this->m_learning_rate * (du_ff + du_fb);
@@ -89,6 +100,12 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
         for (int k = 0; k < this->m_num_discretization; k++) {
             J = J + this->m_cost_ptr->L(x[k], u[k], dt);
         }
+
+#ifdef DEBUG
+        if (std::isnan(J) && i > 0 ) {
+            std::cout << "error: DDP iteration has diverged, consider reducing learning rate\n"; exit(-1);
+        }
+#endif
 
         // Compute the value function, its gradient and Hessian of the last state using the terminal cost
         V.back() = this->m_cost_ptr->phi(x.back(), x_star);
