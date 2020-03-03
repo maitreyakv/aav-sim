@@ -10,7 +10,7 @@
 
 #include "QuadcopterDynamics.h"
 #include "../../mpcsim/src/DDPController.h"
-#include "../../mpcsim/src/QuadraticCost.h"
+#include "../../mpcsim/src/QuadraticObstacleCost.h"
 #include "../../mpcsim/src/Simulation.h"
 
 arma::vec genVectorFromInputOption(boost::property_tree::ptree inputs, std::string option) {
@@ -55,7 +55,7 @@ int main() {
     double I_yy = stod( inputs.get<std::string>("QuadcopterParameters.I_yy") );
     double I_zz = stod( inputs.get<std::string>("QuadcopterParameters.I_zz") );
 
-    QuadcopterDynamics* quadcopter_dynamics_ptr = new QuadcopterDynamics(m, g, l, k, b, I_xx, I_yy, I_zz);
+    QuadcopterDynamics* dynamics_ptr = new QuadcopterDynamics(m, g, l, k, b, I_xx, I_yy, I_zz);
 
     arma::vec x_0 = genVectorFromInputOption(inputs, "SimulationParameters.x_0");
 
@@ -63,16 +63,22 @@ int main() {
 
     arma::mat Q_f = genDiagonalMatrixFromInputOption(inputs, "CostFunctionParameters.Q_f");
     arma::mat R = genDiagonalMatrixFromInputOption(inputs, "CostFunctionParameters.R");
-    QuadraticCost* quadratic_cost_ptr = new QuadraticCost(Q_f, R);
+    std::vector<arma::vec> obstacles;
+    obstacles.push_back(arma::zeros<arma::vec>(12));
+    arma::mat sigma = arma::zeros<arma::mat>(12, 12);
+    sigma(0,0) = stod( inputs.get<std::string>("CostFunctionParameters.sigma") );
+    sigma(1,1) = sigma(0,0);
+    sigma(2,2) = sigma(0,0);
+    QuadraticObstacleCost* cost_ptr = new QuadraticObstacleCost(Q_f, R, obstacles, sigma);
 
     arma::vec u_max = stod( inputs.get<std::string>("QuadcopterParameters.u_max") ) * arma::ones<arma::vec>(4);
 
-    DDPController* ddp_controller_ptr = new DDPController( quadcopter_dynamics_ptr, quadratic_cost_ptr, u_max,
-        stod( inputs.get<std::string>("ControllerParameters.num_iterations") ),
+    DDPController* controller_ptr = new DDPController( dynamics_ptr, cost_ptr, u_max,
         stod( inputs.get<std::string>("ControllerParameters.num_discretizations") ),
+        stod( inputs.get<std::string>("ControllerParameters.num_iterations") ),
         stod( inputs.get<std::string>("ControllerParameters.learning_rate") ) );
 
-    System* system_ptr = new System(quadcopter_dynamics_ptr, ddp_controller_ptr);
+    System* system_ptr = new System(dynamics_ptr, controller_ptr);
 
     Simulation* simulation_ptr = new Simulation(system_ptr,
         1.0 / stod( inputs.get<std::string>("SimulationParameters.mpc_rate") ),

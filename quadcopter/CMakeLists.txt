@@ -21,8 +21,8 @@ add_executable(quadcopter-sim
         ../mpcsim/src/Dynamics.h
         ../mpcsim/src/Controller.h
         ../mpcsim/src/Cost.h
-        ../mpcsim/src/QuadraticCost.cpp
-        ../mpcsim/src/QuadraticCost.h
+        ../mpcsim/src/QuadraticObstacleCost.cpp
+        ../mpcsim/src/QuadraticObstacleCost.h
         ../mpcsim/src/DDPController.cpp
         ../mpcsim/src/DDPController.h
         src/QuadcopterDynamics.cpp
@@ -30,8 +30,10 @@ add_executable(quadcopter-sim
 
 target_link_libraries(quadcopter-sim ${ARMADILLO_LIBRARIES})
 
+target_compile_options(quadcopter-sim PRIVATE -O3 -Wall -Wextra -larmadillo -DDEBUG)
+
 if (${APPLE})
-    target_compile_options(quadcopter-sim PRIVATE -O3 -Wall -Wextra -larmadillo -framework Accelerate)
+    target_compile_options(quadcopter-sim PRIVATE -framework Accelerate)
 else()
-    target_compile_options(quadcopter-sim PRIVATE -O3 -Wall -Wextra -larmadillo -lblas -llapack)
+    target_compile_options(quadcopter-sim PRIVATE -lblas -llapack)
 endif ()
