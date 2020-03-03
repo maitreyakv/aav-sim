@@ -96,9 +96,6 @@ if __name__ == "__main__":
 
     omega = A * Matrix([phi_dot, theta_dot, psi_dot])
 
-    #R = Matrix([[c_phi*c_psi - c_theta*s_phi*s_psi, -c_psi*s_phi - c_phi*c_theta*s_psi, s_theta*s_psi],
-    #            [c_theta*c_psi*s_phi + c_phi*s_psi, c_phi*c_theta*c_psi - s_phi*s_psi, -c_psi*s_theta],
-    #            [s_phi*s_theta, c_phi*s_theta, c_theta]])
     R = Matrix([[c_phi*c_theta, c_phi*s_theta*s_psi - c_psi*s_phi, s_phi*s_psi + c_phi*c_psi*s_theta],
                 [c_theta*s_phi, c_phi*c_psi + s_phi*s_theta*s_psi, c_psi*s_phi*s_theta - c_phi*s_psi],
                 [-s_theta, c_theta*s_psi, c_theta*c_psi]])
