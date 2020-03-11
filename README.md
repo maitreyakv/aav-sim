@@ -20,7 +20,7 @@ The goals for this software include:
 4. Add proper file IO for saving simulation data and parameters (maybe in HDF5 or JSON)
 5. Add Javascript wrapper to perform simulation and display results using Three.js in an interactive manner
 
-While this software was written for the purpose of simulating the quadcopter, the bulk of the code can be used to simulating any system with model predictive control without needing to change any of the existing code. For example, the cart-pole system has also been simulated with this software
+While this software was written for the purpose of simulating the quadcopter, the bulk of the code can be used to simulating any system with model predictive control without needing to change any of the existing code. For example, the cart-pole system has also been simulated with this software, and the only thing that needed to be added were implementing the equations of motion of the system and writing a driver program that made calls to the mpc-sim code.
 
 ![](cart_pole/cart-pole.gif)
 
