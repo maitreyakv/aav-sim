@@ -48,6 +48,7 @@ public:
         : m_system_ptr(system_ptr),
           m_mpc_time_step(mpc_time_step),
           m_x(x_0),
+          m_t(0.0),
           m_x_star(x_star),
           m_horizon(horizon)
     {}
@@ -57,8 +58,9 @@ public:
      * control input
      *
      * @param time Total time to simulate the system for from the initial state
+     * @return 0 if successful, nonzero otherwise
      */
-    void simulate(double time);
+    int simulate(double time);
 };
 
 

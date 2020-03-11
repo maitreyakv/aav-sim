@@ -73,8 +73,9 @@ public:
      * @param x_star Target state of the System with which to design the control to achieve
      * @param t Current time of the System in the Simulation
      * @param horizon The time horizon within which to compute the optimal control
+     * @return 0 if successful, nonzero otherwise
      */
-    void updateControl(arma::vec x, arma::vec x_star, double t, double horizon);
+    int updateControl(arma::vec x, arma::vec x_star, double t, double horizon);
 
     /** Getter method for the control input that is currently being used
      *
