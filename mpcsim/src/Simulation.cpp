@@ -2,6 +2,7 @@
  * Copyright (C) 2020 Maitreya Venkataswamy - All Rights Reserved
  */
 
+#include <fstream>
 #include <boost/numeric/odeint.hpp>
 
 #include "Simulation.h"
@@ -20,25 +21,31 @@ namespace boost {
     }
 }
 
-void Simulation::simulate(double time) {
+int Simulation::simulate(double time) {
     // Make armadillo vectors resizable in odeint
     BOOST_STATIC_ASSERT(boost::numeric::odeint::is_resizeable<arma::vec>::value == true);
 
     // Initialize the time horizon with the specified horizon, this may be edited during the simulation
     double horizon = this->m_horizon;
 
+    // Open a text file for the simulation output
+    std::ofstream output_file;
+    output_file.open("output.txt", std::ios::trunc);
+
     // Perform the simulation by updating the control and integrating the system
     while (this->m_t < time) {
-
-
-        // TEMP: output for post-processing, will be replaced with proper file IO
+        // Obtain the current control
         arma::vec u = this->m_system_ptr->getControl();
-        std::cout << this->m_t << "," << u[0] << "," << u[1] << "," << u[2] << "," << u[3];
-        for (int i = 0; i < 12; i++) {
-            std::cout << "," << this->m_x[i];
-        }
-        std::cout << std::endl;
 
+        // Write the current time, control, and state of the system to the output file
+        output_file << this->m_t;
+        for (double &value : u) {
+            output_file << "," << value;
+        }
+        for (double &value : this->m_x) {
+            output_file << "," << value;
+        }
+        output_file << std::endl;
 
         // If the time horizon stretches beyond the final time, then shrink it such that it doesn't
         if (this->m_t + horizon > time) {
@@ -46,13 +53,22 @@ void Simulation::simulate(double time) {
         }
 
         // Update the control with a newly computed control input with the current state of the system
-        this->m_system_ptr->updateControl(this->m_x, this->m_x_star, this->m_t, horizon);
+        int status = this->m_system_ptr->updateControl(this->m_x, this->m_x_star, this->m_t, horizon);
+        if (status != 0) {
+            return -1;
+        }
 
         // Use odeint to integrate the system from the current time to the time of the next control update
-        boost::numeric::odeint::integrate(*(this->m_system_ptr), this->m_x , this->m_t ,
+        boost::numeric::odeint::integrate(*(this->m_system_ptr), this->m_x , this->m_t,
                                           this->m_t + this->m_mpc_time_step , this->m_mpc_time_step);
 
         // Update the time of the simulation
         this->m_t = this->m_t + this->m_mpc_time_step;
     }
+
+    // Close the output file
+    output_file.close();
+
+    // Return with no errors
+    return 0;
 }
