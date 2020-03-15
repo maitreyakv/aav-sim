@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This software is for simulating model predictive control of systems. In particular, this was developed for simulating a controller quad-copter that autonomously navigates a field of obstacles
+This software is for simulating model predictive control of systems. In particular, this was developed for simulating a quad-copter that autonomously navigates a field of obstacles
 
 NOTE: This is currently a work in progress. As of 3/11/2020, the software has been demonstrated to navigate a quadcopter between two waypoints while avoiding a sphere between the waypoints (see gif below).
 
@@ -15,10 +15,11 @@ The quadcopter is able to navigate from one point to the other by flying underne
 The goals for this software include:
 
 1. Navigate a quadcopter between two waypoints with randomly placed spherical obstacles in the way
-2. Add process noise to the system (e.g. wind) to simulate the ability of MPC to robustly control the quadcopter
-3. Improve the quadcopter dynamics model with more complex dynamics (drag, etc.)
-4. Add proper file IO for saving simulation data and parameters (maybe in HDF5 or JSON)
-5. Add Javascript wrapper to perform simulation and display results using Three.js in an interactive manner
+2. Implement regularization and adaptive learning rate in the DDP algorithm
+3. Add process noise to the system (e.g. wind) to simulate the ability of MPC to robustly control the quadcopter
+4. Improve the quadcopter dynamics model with more complex dynamics (drag, etc.)
+5. Add proper file IO for saving simulation data and parameters (maybe in HDF5 or JSON)
+6. Add Javascript wrapper to perform simulation and display results using Three.js in an interactive manner
 
 While this software was written for the purpose of simulating the quadcopter, the bulk of the code can be used to simulating any system with model predictive control without needing to change any of the existing code. For example, the cart-pole system has also been simulated with this software, and the only thing that needed to be added were implementing the equations of motion of the system and writing a driver program that made calls to the mpc-sim code.
 
