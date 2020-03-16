@@ -31,10 +31,10 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
 
     // Initialize control with random control no more than 10% of maximum allowable control
     for (int k = 0; k < this->m_num_discretization; k++) {
-        // Create random control vector in range [0,1]
-        arma::vec u_rand;
+        // Create random control vector with elements in the range [0,1]
+        arma::vec u_rand = arma::zeros<arma::vec>(dim_u);
         for (int m = 0; m < dim_u; m++) {
-            u_rand << rand() / (double) RAND_MAX;
+            u_rand(m) = rand() / (double) RAND_MAX;
         }
 
         // Add the control to the sequence
