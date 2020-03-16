@@ -41,10 +41,27 @@ arma::mat genDiagonalMatrixFromInputOption(boost::property_tree::ptree inputs, s
     return matrix;
 }
 
-int main() {
+int main(int argc, char** argv) {
+    // Check if all program inputs were given
+    if (argc < 2) {
+        std::cout << "error: not enough program arguments provided\nrun program as:\n";
+        std::cout << "    $ " << argv[0] << " [input_file]" << std::endl;
+        return -1;
+    }
 
+    // Get the name of the configuration file
+    std::string input_file_name = argv[1];
+
+    // Read the configuration file with the simulation inputs
     boost::property_tree::ptree inputs;
-    boost::property_tree::ini_parser::read_ini("example_input.ini", inputs);
+
+    // Attempt to read the input file
+    try {
+        boost::property_tree::ini_parser::read_ini(input_file_name, inputs);
+    } catch (boost::wrapexcept<boost::property_tree::ini_parser::ini_parser_error> &e) {
+        std::cout << "error: problem reading input file\n";
+        return -1;
+    }
 
     double m    = stod( inputs.get<std::string>("QuadcopterParameters.m")    );
     double g    = stod( inputs.get<std::string>("QuadcopterParameters.g")    );
