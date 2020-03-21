@@ -5,6 +5,11 @@
 #include "DDPController.h"
 
 arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::vec x_star, double t_f) {
+    // Set up matrix system solver options for armadillo
+    arma::solve_opts::opts arma_solver_opts = arma::solve_opts::likely_sympd
+                                            + arma::solve_opts::refine
+                                            + arma::solve_opts::allow_ugly;
+
     // Compute the time-step of the time discretization used in the algorithm
     double dt = (t_f - t_0) / (this->m_num_discretization - 1);
 
@@ -156,12 +161,12 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
             Q_uu[k] = Q_uu[k] + mu * arma::eye(dim_u, dim_u);
 
             // Compute the feed-forward and feed-backward gains
-            gain_ff[k] = -arma::inv(Q_uu[k]) * Q_u[k];
-            gain_fb[k] = -arma::inv(Q_uu[k]) * Q_ux[k];
+            gain_ff[k] = -arma::solve(Q_uu[k], Q_u[k], arma_solver_opts);
+            gain_fb[k] = -arma::solve(Q_uu[k], Q_ux[k], arma_solver_opts);
 
             // Compute the value function gradient and Hessian during the backwards pass
-            V_x[k] = Q_x[k] - Q_xu[k] * arma::inv(Q_uu[k]) * Q_u[k];
-            V_xx[k] = Q_xx[k] - Q_xu[k] * arma::inv(Q_uu[k]) * Q_ux[k];
+            V_x[k] = Q_x[k] - Q_xu[k] * arma::solve(Q_uu[k], Q_u[k], arma_solver_opts);
+            V_xx[k] = Q_xx[k] - Q_xu[k] * arma::solve(Q_uu[k], Q_ux[k], arma_solver_opts);
         }
     }
 
