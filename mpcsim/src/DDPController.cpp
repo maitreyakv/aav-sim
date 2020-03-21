@@ -55,16 +55,12 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
     std::vector<arma::mat> Q_xu(this->m_num_discretization, arma::zeros<arma::mat>(dim_x, dim_x));
     std::vector<arma::mat> Q_ux(this->m_num_discretization, arma::zeros<arma::mat>(dim_x, dim_x));
 
-    // Allocate sequences for the regularized state action value function derivatives
-    std::vector<arma::mat> Q_uu_reg(this->m_num_discretization, arma::zeros<arma::mat>(dim_x, dim_x));
-    std::vector<arma::mat> Q_ux_reg(this->m_num_discretization, arma::zeros<arma::mat>(dim_x, dim_x));
-
     // Allocate sequences for the feed-forward and feed-back gains
     std::vector<arma::vec> gain_ff(this->m_num_discretization, arma::zeros<arma::vec>(dim_u));
     std::vector<arma::mat> gain_fb(this->m_num_discretization, arma::zeros<arma::mat>(dim_u, dim_x));
 
     // Allocate the regularization parameter
-    double mu = 1.0;
+    double mu;
 
     // Generate initial trajectory using initial random control sequence
     for (int k = 0; k < this->m_num_discretization - 1; k++) {
@@ -127,83 +123,46 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
         V_x.back() = this->m_cost_ptr->phi_x(x.back(), x_star);
         V_xx.back() = this->m_cost_ptr->phi_xx(x.back(), x_star);
 
-        // Initialize a boolean for whether or not the backward pass produced Q_uu that were all positive definite
-        bool is_all_positive_definite = true;
+        // Perform the backward pass
+        for (int k = this->m_num_discretization - 2; k >= 0; k--) {
+            // Compute state-action value function and its derivatives
+            Q_x[k] = this->m_cost_ptr->L_x(x[k], u[k], dt) +
+                     this->m_dynamics_ptr->Phi(x[k], u[k], dt).t() * V_x[k + 1];
+            Q_u[k] = this->m_cost_ptr->L_u(x[k], u[k], dt) +
+                     this->m_dynamics_ptr->Beta(x[k], u[k], dt).t() * V_x[k + 1];
+            Q_xx[k] = this->m_cost_ptr->L_xx(x[k], u[k], dt)
+                      + this->m_dynamics_ptr->Phi(x[k], u[k], dt).t() * V_xx[k + 1]
+                        * this->m_dynamics_ptr->Phi(x[k], u[k], dt);
+            Q_uu[k] = this->m_cost_ptr->L_uu(x[k], u[k], dt)
+                      + this->m_dynamics_ptr->Beta(x[k], u[k], dt).t() * V_xx[k + 1]
+                        * this->m_dynamics_ptr->Beta(x[k], u[k], dt);
+            Q_xu[k] = this->m_cost_ptr->L_xu(x[k], u[k], dt)
+                      + this->m_dynamics_ptr->Phi(x[k], u[k], dt).t() * V_xx[k + 1]
+                        * this->m_dynamics_ptr->Beta(x[k], u[k], dt);
+            Q_ux[k] = this->m_cost_ptr->L_ux(x[k], u[k], dt)
+                      + this->m_dynamics_ptr->Beta(x[k], u[k], dt).t()
+                        * V_xx[k + 1] * this->m_dynamics_ptr->Phi(x[k], u[k], dt);
 
-        // Initialize a count for the number of backward pass tries
-        unsigned int num_backward_pass_attempt = 0;
+            // Ensure that Q_uu is numerically exactly symmetric
+            Q_uu[k] = 0.5 * ( arma::symmatu(Q_uu[k]) + arma::symmatl(Q_uu[k]) );
 
-        // Maximum number of backward pass attempts
-        // TEMP: HARCODED PARAMETER
-        unsigned int max_backward_pass_attempt = 100;
+            // Obtain eigenvalues of unregularized Q_uu matrix
+            arma::vec Q_uu_eigval = arma::eig_sym(Q_uu[k]);
 
-        // Regularization parameter increase and decrease ratios
-        // TEMP: HARDCODED PARAMETER
-        double mu_inc_ratio = 10.0;
-        double mu_dec_ratio = 0.1;
+            // Compute regularization parameter using smallest eigenvalue if Q_uu is not positive definite
+            mu = (Q_uu_eigval[0] < 0.0) ? -Q_uu_eigval[0] : 0.0;
 
-        // Propagate the state-action value function and its derivatives backwards (Backwards Pass)
-        do {
-            // Perform the backward pass
-            for (int k = this->m_num_discretization - 2; k >= 0; k--) {
-                // Compute state-action value function and its derivatives
-                Q_x[k] = this->m_cost_ptr->L_x(x[k], u[k], dt) +
-                         this->m_dynamics_ptr->Phi(x[k], u[k], dt).t() * V_x[k + 1];
-                Q_u[k] = this->m_cost_ptr->L_u(x[k], u[k], dt) +
-                         this->m_dynamics_ptr->Beta(x[k], u[k], dt).t() * V_x[k + 1];
-                Q_xx[k] = this->m_cost_ptr->L_xx(x[k], u[k], dt)
-                          + this->m_dynamics_ptr->Phi(x[k], u[k], dt).t() * V_xx[k + 1]
-                            * this->m_dynamics_ptr->Phi(x[k], u[k], dt);
-                Q_uu[k] = this->m_cost_ptr->L_uu(x[k], u[k], dt)
-                          + this->m_dynamics_ptr->Beta(x[k], u[k], dt).t() * V_xx[k + 1]
-                            * this->m_dynamics_ptr->Beta(x[k], u[k], dt);
-                Q_xu[k] = this->m_cost_ptr->L_xu(x[k], u[k], dt)
-                          + this->m_dynamics_ptr->Phi(x[k], u[k], dt).t() * V_xx[k + 1]
-                            * this->m_dynamics_ptr->Beta(x[k], u[k], dt);
-                Q_ux[k] = this->m_cost_ptr->L_ux(x[k], u[k], dt)
-                          + this->m_dynamics_ptr->Beta(x[k], u[k], dt).t()
-                            * V_xx[k + 1] * this->m_dynamics_ptr->Phi(x[k], u[k], dt);
+            // Regularize state-action value functions
+            Q_uu[k] = Q_uu[k] + mu * arma::eye(dim_u, dim_u);
 
-                // Regularize state-action value functions
-                Q_uu_reg[k] = this->m_cost_ptr->L_uu(x[k], u[k], dt)
-                              + this->m_dynamics_ptr->Beta(x[k], u[k], dt).t()
-                                * (V_xx[k + 1] + mu * arma::eye<arma::mat>(dim_x, dim_x))
-                                * this->m_dynamics_ptr->Beta(x[k], u[k], dt);
-                Q_ux_reg[k] = this->m_cost_ptr->L_ux(x[k], u[k], dt)
-                              + this->m_dynamics_ptr->Beta(x[k], u[k], dt).t()
-                                * (V_xx[k + 1] + mu * arma::eye<arma::mat>(dim_x, dim_x))
-                                * this->m_dynamics_ptr->Phi(x[k], u[k], dt);
+            // Compute the feed-forward and feed-backward gains
+            gain_ff[k] = -arma::inv(Q_uu[k]) * Q_u[k];
+            gain_fb[k] = -arma::inv(Q_uu[k]) * Q_ux[k];
 
-                // Check if the regularized Q_uu is not positive definite
-                if (!Q_uu[k].is_sympd()) {
-                    // Set the flag to false so that the backward pass is repeated
-                    is_all_positive_definite = false;
-
-                    // Increase the regularization parameter
-                    mu = mu_inc_ratio * mu;
-
-                    // Stop the backward pass so it can restart if another attempt is available
-                    if (num_backward_pass_attempt < max_backward_pass_attempt) { break; }
-                }
-
-                // Compute the feed-forward and feed-backward gains
-                gain_ff[k] = -arma::inv(Q_uu_reg[k]) * Q_u[k];
-                gain_fb[k] = -arma::inv(Q_uu_reg[k]) * Q_ux_reg[k];
-
-                // Compute the value function gradient and Hessian during the backwards pass
-                V_x[k] = Q_x[k] + gain_fb[k].t() * Q_uu[k] * gain_ff[k] + gain_fb[k].t() * Q_u[k] +
-                         Q_ux[k].t() * gain_ff[k];
-                V_xx[k] = Q_xx[k] + gain_fb[k].t() * Q_uu[k] * gain_fb[k] + gain_fb[k].t() * Q_ux[k] +
-                          Q_ux[k].t() * gain_fb[k];
-            }
-
-            // Increment the number of backward pass attempts counter
-            num_backward_pass_attempt++;
-            std::cout << num_backward_pass_attempt << std::endl;
-        } while (!is_all_positive_definite && num_backward_pass_attempt < max_backward_pass_attempt);
-
-        // Decrease the regularization parameter
-        mu = mu_dec_ratio * mu;
+            // Compute the value function gradient and Hessian during the backwards pass
+            V_x[k] = Q_x[k] - Q_xu[k] * arma::inv(Q_uu[k]) * Q_u[k];
+            V_xx[k] = Q_xx[k] - Q_xu[k] * arma::inv(Q_uu[k]) * Q_ux[k];
+        }
     }
 
     // Return the first control input in the optimal control sequence
