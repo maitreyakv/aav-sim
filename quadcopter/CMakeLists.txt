@@ -21,10 +21,14 @@ add_executable(quadcopter-sim
         ../mpcsim/src/Dynamics.h
         ../mpcsim/src/Controller.h
         ../mpcsim/src/Cost.h
+        ../mpcsim/src/QuadraticCost.cpp
+        ../mpcsim/src/QuadraticCost.h
         ../mpcsim/src/QuadraticObstacleCost.cpp
         ../mpcsim/src/QuadraticObstacleCost.h
         ../mpcsim/src/DDPController.cpp
         ../mpcsim/src/DDPController.h
+        ../mpcsim/src/SamplerController.cpp
+        ../mpcsim/src/SamplerController.h
         src/QuadcopterDynamics.cpp
         src/QuadcopterDynamics.h)
 

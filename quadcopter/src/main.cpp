@@ -10,6 +10,8 @@
 
 #include "QuadcopterDynamics.h"
 #include "../../mpcsim/src/DDPController.h"
+#include "../../mpcsim/src/SamplerController.h"
+#include "../../mpcsim/src/QuadraticCost.h"
 #include "../../mpcsim/src/QuadraticObstacleCost.h"
 #include "../../mpcsim/src/Simulation.h"
 
@@ -91,9 +93,13 @@ int main(int argc, char** argv) {
     arma::vec u_max = stod( inputs.get<std::string>("QuadcopterParameters.u_max") ) * arma::ones<arma::vec>(4);
 
     DDPController* controller_ptr = new DDPController( dynamics_ptr, cost_ptr, u_max,
-        stod( inputs.get<std::string>("ControllerParameters.num_discretizations") ),
-        stod( inputs.get<std::string>("ControllerParameters.num_iterations") ),
-        stod( inputs.get<std::string>("ControllerParameters.learning_rate") ) );
+        stod( inputs.get<std::string>("DDPControllerParameters.num_discretizations") ),
+        stod( inputs.get<std::string>("DDPControllerParameters.num_iterations") ),
+        stod( inputs.get<std::string>("DDPControllerParameters.learning_rate") ) );
+
+    //SamplerController* controller_ptr = new SamplerController( dynamics_ptr, cost_ptr, u_max,
+    //    stod( inputs.get<std::string>("SamplerControllerParameters.num_discretizations") ),
+    //    stod( inputs.get<std::string>("SamplerControllerParameters.num_samples") ) );
 
     System* system_ptr = new System(dynamics_ptr, controller_ptr);
 
