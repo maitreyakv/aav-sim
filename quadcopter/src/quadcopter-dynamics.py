@@ -41,6 +41,13 @@ def convert_to_cpp_code(string):
     for n in range(100):
         string = string.replace("x%d**2" % n, "pow(x%d, 2)" % n)
 
+    for n in range(4):
+        string = string.replace("u[%d]**2" % n, "pow(u[%d], 2)" % n)
+
+    for n in range(100):
+        for m in range(4):
+            string = string.replace("(2*u[%d] + x%d)**2" % (m,n), "pow(2*u[%d] + x%d, 2)" % (m,n))
+
     return string
 
 def insert_code(tag, code, last):
@@ -77,10 +84,10 @@ if __name__ == "__main__":
     m, g, l, k, b, I_xx, I_yy, I_zz = symbols('m g l k b I_xx I_yy I_zz')
     u_1, u_2, u_3, u_4 = symbols('u_1 u_2 u_3 u_4')
 
-    gamma_1 = 1000*u_1 + m*g/(4*k)
-    gamma_2 = 1000*u_2 + m*g/(4*k)
-    gamma_3 = 1000*u_3 + m*g/(4*k)
-    gamma_4 = 1000*u_4 + m*g/(4*k)
+    gamma_1 = (sqrt(m*g/(4*k)) + u_1)**2
+    gamma_2 = (sqrt(m*g/(4*k)) + u_2)**2
+    gamma_3 = (sqrt(m*g/(4*k)) + u_3)**2
+    gamma_4 = (sqrt(m*g/(4*k)) + u_4)**2
 
     # Intermediate expressions
     s_phi = sin(phi)
