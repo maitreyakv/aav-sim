@@ -48,9 +48,12 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
     }
 
     // Allocate sequences for value function and its gradient and Hessian
-    std::vector<double> V(this->m_num_discretization, 0.0);
+    //std::vector<double> V(this->m_num_discretization, 0.0);
     std::vector<arma::vec> V_x(this->m_num_discretization, arma::zeros<arma::vec>(dim_x));
     std::vector<arma::mat> V_xx(this->m_num_discretization, arma::zeros<arma::mat>(dim_x, dim_x));
+
+    // Allocate sequence for the expected changes in the value function
+    std::vector<double> delta_V(this->m_num_discretization, 0.0);
 
     // Allocate sequences for the state-action value function's various first and second derivatives
     std::vector<arma::vec> Q_x(this->m_num_discretization, arma::zeros<arma::vec>(dim_x));
@@ -70,11 +73,11 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
     // Generate initial trajectory using initial random control sequence
     for (int k = 0; k < this->m_num_discretization - 1; k++) {
         // Integrate state using Euler integration scheme
-        x_new[k+1] = x_new[k] + this->m_dynamics_ptr->F(x_new[k], u[k], t[k]) * dt;
+        x[k+1] = x[k] + this->m_dynamics_ptr->F(x[k], u[k], t[k]) * dt;
 
 #ifdef DEBUG
         for (int i = 0; i < dim_x; i++) {
-            if (std::isnan(x_new[k+1](i))) {
+            if (std::isnan(x[k+1](i))) {
                 std::cout << "error: DDP initialized trajectory contains NaN\n"; exit(-1);
             }
         }
@@ -87,44 +90,14 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
 
     // Perform DDP algorithm by performing forward and backwards passes
     for (int i = 0; i < this->m_num_iteration; i++) {
-        // Compute feed-forward and feed-backward terms and update control (Forward Pass)
-        for (int k = 0; k < this->m_num_discretization - 1; k++) {
-            // Compute feed-forward and feed-backward terms
-            du_ff = gain_ff[k];
-            du_fb = gain_fb[k] * (x_new[k] - x[k]);
-
-            // Limit feed-forward component of control update using simple clamping
-            for (int m = 0; m < dim_u; m++) {
-                du_ff(m) = fmin( this->m_u_max(m), fmax(-this->m_u_max(m), du_ff(m) + u[k](m)) ) - u[k](m);
-            }
-
-            // Update control using correction terms scaled by the learning rate
-            u_new[k] = u[k] + this->m_learning_rate * du_ff + du_fb;
-
-            // Propagate the trajectory using the updated control
-            x_new[k+1] = x_new[k] + this->m_dynamics_ptr->F(x_new[k], u_new[k], t[k]) * dt;
-        }
-
-        // Copy the updated control into the current nominal control
-        u = u_new;
-
-        // Copy the new trajectory into the old trajectory for the purpose of comparing trajectories between iterations
-        x = x_new;
-
-        // Compute total cost of trajectory
+        // Compute total cost of current trajectory
         double J = this->m_cost_ptr->phi(x.back(), x_star);
         for (int k = 0; k < this->m_num_discretization; k++) {
             J = J + this->m_cost_ptr->L(x[k], u[k], dt);
         }
 
-#ifdef DEBUG
-        if (std::isnan(J) && i > 0 ) {
-            std::cout << "error: DDP iteration has diverged, consider reducing learning rate\n"; exit(-1);
-        }
-#endif
-
         // Compute the value function, its gradient and Hessian of the last state using the terminal cost
-        V.back() = this->m_cost_ptr->phi(x.back(), x_star);
+        //V.back() = this->m_cost_ptr->phi(x.back(), x_star);
         V_x.back() = this->m_cost_ptr->phi_x(x.back(), x_star);
         V_xx.back() = this->m_cost_ptr->phi_xx(x.back(), x_star);
 
@@ -167,7 +140,43 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
             // Compute the value function gradient and Hessian during the backwards pass
             V_x[k] = Q_x[k] - Q_xu[k] * arma::solve(Q_uu[k], Q_u[k], arma_solver_opts);
             V_xx[k] = Q_xx[k] - Q_xu[k] * arma::solve(Q_uu[k], Q_ux[k], arma_solver_opts);
+
+            // Compute the expected change in the value function
+            delta_V[k] = arma::as_scalar( -0.5 * Q_u[k].t() * arma::solve(Q_uu[k], Q_u[k], arma_solver_opts) );
         }
+
+        // Compute feed-forward and feed-backward terms and update control (Forward Pass)
+        for (int k = 0; k < this->m_num_discretization - 1; k++) {
+            // Compute feed-forward and feed-backward terms
+            du_ff = gain_ff[k];
+            du_fb = gain_fb[k] * (x_new[k] - x[k]);
+
+            // Limit feed-forward component of control update using simple clamping
+            for (int m = 0; m < dim_u; m++) {
+                du_ff(m) = fmin(this->m_u_max(m), fmax(-this->m_u_max(m), du_ff(m) + u[k](m))) - u[k](m);
+            }
+
+            // Update control using correction terms scaled by the learning rate
+            u_new[k] = u[k] + this->m_learning_rate * du_ff + du_fb;
+
+            // Propagate the trajectory using the updated control
+            x_new[k + 1] = x_new[k] + this->m_dynamics_ptr->F(x_new[k], u_new[k], t[k]) * dt;
+        }
+
+        // Compute total cost of new trajectory
+        double J_new = this->m_cost_ptr->phi(x_new.back(), x_star);
+        for (int k = 0; k < this->m_num_discretization; k++) {
+            J_new = J_new + this->m_cost_ptr->L(x_new[k], u_new[k], dt);
+        }
+
+        // Copy the updated control into the current nominal control
+        u = u_new;
+
+        // Copy the new trajectory into the old trajectory for the purpose of comparing trajectories between iterations
+        x = x_new;
+
+        // TEMP
+        std::cout << J << "," << J_new << std::endl;
     }
 
     // Return the first control input in the optimal control sequence

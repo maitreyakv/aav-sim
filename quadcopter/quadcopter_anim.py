@@ -130,15 +130,15 @@ while(True):
 
     thrust1.pos = motor1_pos
     thrust1.axis = motor_dir
-    thrust1.length = (u_1[n] + 0.5*u_max) / 50
+    thrust1.length = u_1[n] / 10
     thrust2.pos = motor2_pos
     thrust2.axis = motor_dir
-    thrust2.length = (u_2[n] + 0.5*u_max) / 50
+    thrust2.length = u_2[n] / 10
     thrust3.pos = motor3_pos
     thrust3.axis = motor_dir
-    thrust3.length = (u_3[n] + 0.5*u_max) / 50
+    thrust3.length = u_3[n] / 10
     thrust4.pos = motor4_pos
     thrust4.axis = motor_dir
-    thrust4.length = (u_4[n] + 0.5*u_max) / 50
+    thrust4.length = u_4[n] / 10
 
     m += 1
