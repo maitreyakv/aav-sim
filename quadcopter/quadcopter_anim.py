@@ -13,6 +13,8 @@ phi = []
 theta = []
 psi = []
 
+trajectories = []
+
 with open("output.txt", "r") as f:
     for line in f.readlines():
         if "nan" in line or "error" in line:
@@ -31,6 +33,16 @@ with open("output.txt", "r") as f:
             u_2.append(float(line[2]))
             u_3.append(float(line[3]))
             u_4.append(float(line[4]))
+
+with open("tmp.txt", "r") as f:
+    for line in f.readlines():
+        traj = []
+        line = line.strip().split(",")
+        for i in range(int((len(line) - 1)/3)):
+            traj.append([float(line[3*i]),
+                         float(line[3*i+1]),
+                         float(line[3*i+2])])
+        trajectories.append(traj)
 
 dt = t[1] - t[0]
 
@@ -77,6 +89,8 @@ scene.camera.follow(box1)
 scene.range = 2
 
 time_scale = 1.0;
+
+c = curve()
 
 m = 0
 while(True):
@@ -140,5 +154,11 @@ while(True):
     thrust4.pos = motor4_pos
     thrust4.axis = motor_dir
     thrust4.length = u_4[n] / 10
+
+    c.clear()
+    for i in range(len(trajectories[0])):
+        c.append(vector(trajectories[n][i][0],
+                        trajectories[n][i][1],
+                        trajectories[n][i][2]))
 
     m += 1
