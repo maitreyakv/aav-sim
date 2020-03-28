@@ -8,6 +8,7 @@
 
 #include "../../mpcsim/src/Dynamics.h"
 
+// TODO: Update documentation
 
 class QuadcopterDynamics : public Dynamics {
 
@@ -54,31 +55,17 @@ public:
      */
     arma::vec F(arma::vec x, arma::vec u, double t);
 
-    /**
-     * Computes the gradient of the state derivative F_x of the Dynamics with respect to the state,
-     * returned in the form
-     *
-     *      Phi = I + F_x(x,u) * dt
-     *
-     * @param x Vector with the state "x" to evaluate F_x(x,u) at
-     * @param u Vector with the control input "u" to evaluate F_x(x,u) at
-     * @param dt The discretized time step in the DDP algorithm, t(k+1) - t(k)
-     * @return Matrix containing Phi
-     */
-    arma::mat Phi(arma::vec x, arma::vec u, double dt);
+    arma::vec f(arma::vec x, arma::vec u, double t, double dt);
 
-    /**
-     * Computes the gradient of the state derivative F_x of the Dynamics with respect to the control,
-     * returned in the form
-     *
-     *      Beta = F_u(x,u) * dt
-     *
-     * @param x Vector with the state "x" to evaluate F_x(x,u) at
-     * @param u Vector with the control input "u" to evaluate F_x(x,u) at
-     * @param dt The discretized time step in the DDP algorithm, t(k+1) - t(k)
-     * @return Matrix containing Beta
-     */
-    arma::mat Beta(arma::vec x, arma::vec u, double dt);
+    arma::mat f_x(arma::vec x, arma::vec u, double t, double dt);
+
+    arma::mat f_u(arma::vec x, arma::vec u, double t, double dt);
+
+    arma::cube f_xx(arma::vec x, arma::vec u, double t, double dt);
+
+    arma::cube f_uu(arma::vec x, arma::vec u, double t, double dt);
+
+    arma::cube f_ux(arma::vec x, arma::vec u, double t, double dt);
 
     /**
      * Returns the number of elements (dimensionality) of the state vector, which is 12 for this system:
