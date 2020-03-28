@@ -5,7 +5,7 @@ This software is for simulating model predictive control of autonomous aerial ve
 
 NOTE: This is currently a work in progress. As of 3/11/2020, the software has been demonstrated to navigate a quadcopter between two waypoints while avoiding a sphere between the waypoints (see gif below).
 
-![](quadcopter/quadcopter-obstacle-1.gif)
+![](quadcopter-obstacle-1.gif)
 
 The quadcopter is able to navigate from one point to the other by flying underneath the obstacle.
 
