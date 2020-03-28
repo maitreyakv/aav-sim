@@ -13,8 +13,9 @@ The quadcopter is able to navigate from one point to the other by flying underne
 
 The goals for this software include:
 
-- [ ] Navigate a quadcopter between two waypoints with randomly placed spherical obstacles in the way
-- [X] Implement regularization and adaptive learning rate in the DDP algorithm
+- [ ] Use path planning (RRT, RRT*, A*, etc.) for high level trajectory design and then use MPC to follow path
+- [ ] Navigate a quadcopter between two waypoints with randomly placed obstacles of arbitrary shape in the way
+- [X] Implement regularization and adaptive learning rate in the DDP algorithm in MPC
 - [ ] Add process noise to the system (e.g. wind) to simulate the ability of MPC to robustly control the quadcopter
 - [ ] Improve the quadcopter dynamics model with more complex dynamics (drag, etc.)
 - [ ] Add proper file IO for saving simulation data and parameters (maybe in HDF5 or JSON)
