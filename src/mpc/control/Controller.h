@@ -2,12 +2,12 @@
  * Copyright (C) 2020 Maitreya Venkataswamy - All Rights Reserved
  */
 
-#ifndef MPCSIM_CONTROLLER_H
-#define MPCSIM_CONTROLLER_H
+#ifndef AAVSIM_CONTROLLER_H
+#define AAVSIM_CONTROLLER_H
 
 
-#include "Dynamics.h"
-#include "Cost.h"
+#include "../../simulation/Dynamics.h"
+#include "../cost/Cost.h"
 
 /**
  * Implements the controlling algorithm for the System.
@@ -59,4 +59,4 @@ public:
 };
 
 
-#endif //MPCSIM_CONTROLLER_H
+#endif //AAVSIM_CONTROLLER_H

@@ -2,8 +2,8 @@
  * Copyright (C) 2020 Maitreya Venkataswamy - All Rights Reserved
  */
 
-#ifndef MPCSIM_SIMULATION_H
-#define MPCSIM_SIMULATION_H
+#ifndef AAVSIM_SIMULATION_H
+#define AAVSIM_SIMULATION_H
 
 
 #include "System.h"
@@ -64,4 +64,4 @@ public:
 };
 
 
-#endif //MPCSIM_SIMULATION_H
+#endif //AAVSIM_SIMULATION_H

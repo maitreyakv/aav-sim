@@ -2,8 +2,8 @@
  * Copyright (C) 2020 Maitreya Venkataswamy - All Rights Reserved
  */
 
-#ifndef MPCSIM_DDPCONTROLLER_H
-#define MPCSIM_DDPCONTROLLER_H
+#ifndef AAVSIM_DDPCONTROLLER_H
+#define AAVSIM_DDPCONTROLLER_H
 
 
 #include <armadillo>
@@ -86,4 +86,4 @@ public:
 };
 
 
-#endif //MPCSIM_DDPCONTROLLER_H
+#endif //AAVSIM_DDPCONTROLLER_H

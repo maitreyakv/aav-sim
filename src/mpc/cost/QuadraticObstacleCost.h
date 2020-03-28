@@ -2,8 +2,8 @@
  * Copyright (C) 2020 Maitreya Venkataswamy - All Rights Reserved
  */
 
-#ifndef MPCSIM_QUADRATICCOST_H
-#define MPCSIM_QUADRATICCOST_H
+#ifndef AAVSIM_QUADRATICOBSTACLECOST_H
+#define AAVSIM_QUADRATICOBSTACLECOST_H
 
 
 #include <armadillo>
@@ -11,19 +11,17 @@
 #include "Cost.h"
 
 /**
- * Implementation of quadratic cost function.
+ * Implementation of quadratic cost function with obstacle avoidance.
  *
- * Quadratic cost functions are the simplest that can be used in methods like DDP because they are very easy to
- * minimize. These are of the form
- *
- *      Terminal Cost: phi = 0.5 * (x_f - x_star)^T * Q_f * (x_f - x_star)
- *
- *      Transition Cost: L =  0.5 * u^T * R * u * dt
+ * The quadratic cost function for the control and terminal cost are the same as in the QuadraticCost class. This
+ * class also implemented Gaussian-form cost functions to penalize the proximity of the state to a set of obstacle
+ * states. This in effect, drives the optimized trajectories away from these states, which in the case of a physical
+ * obstacle, means distancing a vehicle from a set of obstacles.
  *
  * The transition cost is multiplied by the algorithm time-step, since the cost is being applied during the entire
  * transition of the state given the state-action pair (x,u).
  */
-class QuadraticCost : public Cost {
+class QuadraticObstacleCost : public Cost {
 
 private:
     // Matrix of weights used in quadratic terminal cost
@@ -32,16 +30,26 @@ private:
     // Matrix of weights used in the quadratic transition cost, with only control cost
     arma::mat m_R;
 
+    // List of obstacles
+    std::vector<arma::vec> m_obstacles;
+
+    // Weight matrix penalizing distance to obstacles
+    arma::mat m_sigma;
+
 public:
     /**
      * Constructor using member-list initialization
      *
      * @param Q_f Matrix of weights used in quadratic terminal cost
      * @param R Matrix of weights used in the quadratic transition cost, with only control cos
+     * @param obstacles List of obstacles state vectors
+     * @param sigma Penalizing matrix for the obstacles
      */
-    QuadraticCost(arma::mat Q_f, arma::mat R)
+    QuadraticObstacleCost(arma::mat Q_f, arma::mat R, std::vector<arma::vec> obstacles, arma::mat sigma)
         : m_Q_f(Q_f),
-          m_R(R)
+          m_R(R),
+          m_obstacles(obstacles),
+          m_sigma(sigma)
     {}
 
     /**
@@ -170,4 +178,4 @@ public:
 };
 
 
-#endif //MPCSIM_QUADRATICCOST_H
+#endif //AAVSIM_QUADRATICOBSTACLECOST_H

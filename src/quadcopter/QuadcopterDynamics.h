@@ -2,11 +2,11 @@
  * Copyright (C) 2020 Maitreya Venkataswamy - All Rights Reserved
  */
 
-#ifndef MPCSIM_QUADCOPTERDYNAMICS_H
-#define MPCSIM_QUADCOPTERDYNAMICS_H
+#ifndef AAVSIM_QUADCOPTERDYNAMICS_H
+#define AAVSIM_QUADCOPTERDYNAMICS_H
 
 
-#include "../../mpcsim/src/Dynamics.h"
+#include "../simulation/Dynamics.h"
 
 // TODO: Update documentation
 
@@ -87,4 +87,4 @@ public:
 };
 
 
-#endif //MPCSIM_QUADCOPTERDYNAMICS_H
+#endif //AAVSIM_QUADCOPTERDYNAMICS_H

@@ -2,13 +2,13 @@
  * Copyright (C) 2020 Maitreya Venkataswamy - All Rights Reserved
  */
 
-#ifndef MPCSIM_SYSTEM_H
-#define MPCSIM_SYSTEM_H
+#ifndef AAVSIM_SYSTEM_H
+#define AAVSIM_SYSTEM_H
 
 
 #include <armadillo>
 
-#include "Controller.h"
+#include "../mpc/control/Controller.h"
 #include "Dynamics.h"
 
 /**
@@ -85,4 +85,4 @@ public:
 };
 
 
-#endif //MPCSIM_SYSTEM_H
+#endif //AAVSIM_SYSTEM_H

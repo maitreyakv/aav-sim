@@ -2,8 +2,8 @@
  * Copyright (C) 2020 Maitreya Venkataswamy - All Rights Reserved
  */
 
-#ifndef MPCSIM_SAMPLERCONTROLLER_H
-#define MPCSIM_SAMPLERCONTROLLER_H
+#ifndef AAVSIM_SAMPLERCONTROLLER_H
+#define AAVSIM_SAMPLERCONTROLLER_H
 
 
 #include <armadillo>
@@ -41,4 +41,4 @@ public:
 };
 
 
-#endif //MPCSIM_SAMPLERCONTROLLER_H
+#endif //AAVSIM_SAMPLERCONTROLLER_H

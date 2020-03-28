@@ -2,8 +2,8 @@
  * Copyright (C) 2020 Maitreya Venkataswamy - All Rights Reserved
  */
 
-#ifndef MPCSIM_DYNAMICS_H
-#define MPCSIM_DYNAMICS_H
+#ifndef AAVSIM_DYNAMICS_H
+#define AAVSIM_DYNAMICS_H
 
 
 #include <armadillo>
@@ -44,4 +44,4 @@ public:
 };
 
 
-#endif //MPCSIM_DYNAMICS_H
+#endif //AAVSIM_DYNAMICS_H

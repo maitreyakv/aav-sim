@@ -8,12 +8,11 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "QuadcopterDynamics.h"
-#include "../../mpcsim/src/DDPController.h"
-#include "../../mpcsim/src/SamplerController.h"
-#include "../../mpcsim/src/QuadraticCost.h"
-#include "../../mpcsim/src/QuadraticObstacleCost.h"
-#include "../../mpcsim/src/Simulation.h"
+#include "quadcopter/QuadcopterDynamics.h"
+#include "mpc/control/DDPController.h"
+#include "mpc/cost/QuadraticCost.h"
+#include "mpc/cost/QuadraticObstacleCost.h"
+#include "simulation/Simulation.h"
 
 arma::vec genVectorFromInputOption(boost::property_tree::ptree inputs, std::string option) {
     std::string str = inputs.get<std::string>(option);
