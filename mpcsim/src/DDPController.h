@@ -39,6 +39,12 @@ private:
     // Learning rate in control update in DDP
     double m_learning_rate;
 
+    // Initial control sequence
+    std::vector<arma::vec> m_u_initial;
+
+    // Boolean whether to use the initial control sequence
+    bool m_use_initial_control;
+
 public:
     /**
      * Constructor for the DDPController class that uses member-list initialization
@@ -55,7 +61,8 @@ public:
         : Controller(dynamics_ptr, cost_ptr, u_max),
           m_num_discretization(num_discretization),
           m_num_iteration(num_iteration),
-          m_learning_rate(learning_rate)
+          m_learning_rate(learning_rate),
+          m_use_initial_control(false)
     {}
 
     /**
