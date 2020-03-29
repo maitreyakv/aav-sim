@@ -6,6 +6,7 @@
 #include <boost/numeric/odeint.hpp>
 
 #include "Simulation.h"
+#include "../navigation/RRTPathPlanner.h"
 
 // Required for using Armadillo Vectors with odeint
 namespace boost {
@@ -22,6 +23,19 @@ namespace boost {
 }
 
 int Simulation::simulate(double time) {
+
+    // TEMP
+    std::vector<Obstacle*> obs;
+    RRTPathPlanner* path_planner_ptr = new RRTPathPlanner(obs);
+    arma::vec pos_start = {this->m_x(0), this->m_x(1), this->m_x(2)};
+    arma::vec pos_target = {this->m_x_star(0), this->m_x_star(1), this->m_x_star(2)};
+    std::vector<arma::vec> path = path_planner_ptr->computePath(pos_start, pos_target);
+    for (int i = 0; i < path.size(); i++) {
+        std::cout << path[i](0) << "," << path[i](1) << "," << path[i](2) << std::endl;
+    }
+    delete path_planner_ptr;
+
+
     // Make armadillo vectors resizable in odeint
     BOOST_STATIC_ASSERT(boost::numeric::odeint::is_resizeable<arma::vec>::value == true);
 
