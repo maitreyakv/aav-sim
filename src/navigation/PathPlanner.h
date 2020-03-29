@@ -12,7 +12,7 @@
 
 class PathPlanner {
 
-private:
+protected:
     // List of obstacles to avoid
     std::vector<Obstacle*> m_obstacle_ptrs;
 
