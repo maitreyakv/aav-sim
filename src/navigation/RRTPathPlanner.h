@@ -9,6 +9,9 @@
 #include "PathPlanner.h"
 
 class RRTPathPlanner : public PathPlanner {
+private:
+    bool isCollide(arma::vec point_1, arma::vec point_2);
+
 public:
     RRTPathPlanner(std::vector<Obstacle*> obstacle_ptrs)
         : PathPlanner(obstacle_ptrs)
