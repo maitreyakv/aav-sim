@@ -15,10 +15,15 @@ private:
 
     // Radius of the sphere
     double m_radius;
+    
+    // Factor to multiply the actual radius to get the perceived radius
+    double m_increase_factor;
+    
 public:
-    SphereObstacle(arma::vec center, double radius)
+    SphereObstacle(arma::vec center, double radius, double increase_factor)
         : m_center(center),
-          m_radius(radius)
+          m_radius(radius),
+          m_increase_factor(increase_factor)
     {}
 
     // https://en.wikipedia.org/wiki/Line-sphere_intersection
