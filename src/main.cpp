@@ -81,13 +81,14 @@ int main(int argc, char** argv) {
 
     arma::mat Q_f = genDiagonalMatrixFromInputOption(inputs, "CostFunctionParameters.Q_f");
     arma::mat R = genDiagonalMatrixFromInputOption(inputs, "CostFunctionParameters.R");
-    std::vector<arma::vec> obstacles;
-    obstacles.push_back(arma::zeros<arma::vec>(12));
-    arma::mat sigma = arma::zeros<arma::mat>(12, 12);
-    sigma(0,0) = stod( inputs.get<std::string>("CostFunctionParameters.sigma") );
-    sigma(1,1) = sigma(0,0);
-    sigma(2,2) = sigma(0,0);
-    QuadraticObstacleCost* cost_ptr = new QuadraticObstacleCost(Q_f, R, obstacles, sigma);
+    //std::vector<arma::vec> obstacles;
+    //obstacles.push_back(arma::zeros<arma::vec>(12));
+    //arma::mat sigma = arma::zeros<arma::mat>(12, 12);
+    //sigma(0,0) = stod( inputs.get<std::string>("CostFunctionParameters.sigma") );
+    //sigma(1,1) = sigma(0,0);
+    //sigma(2,2) = sigma(0,0);
+    //QuadraticObstacleCost* cost_ptr = new QuadraticObstacleCost(Q_f, R, obstacles, sigma);
+    QuadraticCost* cost_ptr = new QuadraticCost(Q_f, R);
 
     arma::vec u_max = stod( inputs.get<std::string>("QuadcopterParameters.u_max") ) * arma::ones<arma::vec>(4);
 

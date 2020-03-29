@@ -13,8 +13,6 @@ phi = []
 theta = []
 psi = []
 
-trajectories = []
-
 with open("output.txt", "r") as f:
     for line in f.readlines():
         if "nan" in line or "error" in line:
@@ -34,15 +32,23 @@ with open("output.txt", "r") as f:
             u_3.append(float(line[3]))
             u_4.append(float(line[4]))
 
-with open("tmp.txt", "r") as f:
+pathx = []
+pathy = []
+pathz = []
+
+with open("graph.txt", "r") as f:
     for line in f.readlines():
-        traj = []
         line = line.strip().split(",")
-        for i in range(int((len(line) - 1)/3)):
-            traj.append([float(line[3*i]),
-                         float(line[3*i+1]),
-                         float(line[3*i+2])])
-        trajectories.append(traj)
+
+        if len(line) > 3:
+            #ax.plot([float(line[0]), float(line[3])],
+            #        [float(line[1]), float(line[4])],
+            #        [float(line[2]), float(line[5])], "r")
+            pass
+        else:
+            pathx.append(float(line[0]))
+            pathy.append(float(line[1]))
+            pathz.append(float(line[2]))
 
 dt = t[1] - t[0]
 
@@ -71,9 +77,10 @@ floor = box(pos=vector(0, 0, -side), size=vector(s2, s2, thk), color = color.gra
 
 start = sphere(pos=vector(-2,-2,0), radius=0.05)
 target = sphere(pos=vector(2,2,0), radius=0.05)
+waypoint = sphere(pos=vector(-2,2,0), radius=0.025)
 
 obstacles = []
-obstacles.append( sphere(pos=vector(0,0,0), radius=0.2, color = color.red) )
+obstacles.append( sphere(pos=vector(0,0,0), radius=0.5, color = color.red) )
 
 box1 = box(color = color.red)
 box2 = box(color = color.red)
@@ -91,10 +98,14 @@ scene.range = 2
 time_scale = 1.0;
 
 c = curve()
+for n in range(len(pathx)):
+    c.append(vector(pathx[n], pathy[n], pathz[n]))
 
 m = 0
 while(True):
     n = m % len(t)
+
+    waypoint.pos = vector(pathx[n], pathy[n], pathz[n])
 
     center_mass = vector(x[n],y[n],z[n])
 
@@ -154,11 +165,5 @@ while(True):
     thrust4.pos = motor4_pos
     thrust4.axis = motor_dir
     thrust4.length = u_4[n] / 10
-
-    c.clear()
-    for i in range(len(trajectories[0])):
-        c.append(vector(trajectories[n][i][0],
-                        trajectories[n][i][1],
-                        trajectories[n][i][2]))
 
     m += 1
