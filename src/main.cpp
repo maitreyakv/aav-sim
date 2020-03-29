@@ -13,6 +13,9 @@
 #include "mpc/cost/QuadraticCost.h"
 #include "mpc/cost/QuadraticObstacleCost.h"
 #include "simulation/Simulation.h"
+#include "simulation/Obstacle.h"
+#include "simulation/SphereObstacle.h"
+#include "navigation/RRTPathPlanner.h"
 
 arma::vec genVectorFromInputOption(boost::property_tree::ptree inputs, std::string option) {
     std::string str = inputs.get<std::string>(option);
@@ -103,7 +106,13 @@ int main(int argc, char** argv) {
 
     System* system_ptr = new System(dynamics_ptr, controller_ptr);
 
-    Simulation* simulation_ptr = new Simulation(system_ptr,
+    std::vector<Obstacle*> obs;
+    arma::vec center_1 = {0.0, 0.0, 0.0};
+    SphereObstacle* sphere_1_ptr = new SphereObstacle(center_1, 0.5, 1.5);
+    obs.push_back(sphere_1_ptr);
+    RRTPathPlanner* path_planner_ptr = new RRTPathPlanner(obs);
+
+    Simulation* simulation_ptr = new Simulation(system_ptr, path_planner_ptr,
         1.0 / stod( inputs.get<std::string>("SimulationParameters.mpc_rate") ),
         x_0, x_star, stod( inputs.get<std::string>("SimulationParameters.horizon") ));
 
@@ -114,6 +123,8 @@ int main(int argc, char** argv) {
     delete cost_ptr;
     delete controller_ptr;
     delete system_ptr;
+    delete path_planner_ptr;
+    delete sphere_1_ptr;
 
     return 0;
 }

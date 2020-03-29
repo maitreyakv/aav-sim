@@ -7,6 +7,7 @@
 
 
 #include "System.h"
+#include "../navigation/PathPlanner.h"
 
 /**
  * Implementation of a single simulation in the program
@@ -35,17 +36,23 @@ private:
     // Time horizon length of the control optimization process
     double m_horizon;
 
+    // Pointer to PathPlanner used in simulation
+    PathPlanner* m_path_planner_ptr;
+
 public:
     /**
      * Constructor for a Simulation that uses member-list initialization
      *
      * @param system_ptr Pointer to the System being simulated
+     * @param path_planner_ptr Pointer to PathPlanner used in simulation
      * @param mpc_time_step The time between MPC iterations
      * @param x_0 Vector with initial state of the System
      * @param x_star Vector with the target state of the System
      */
-    Simulation(System* system_ptr, double mpc_time_step, arma::vec x_0, arma::vec x_star, double horizon)
+    Simulation(System* system_ptr, PathPlanner* path_planner_ptr, double mpc_time_step, arma::vec x_0,
+                                                                                    arma::vec x_star, double horizon)
         : m_system_ptr(system_ptr),
+          m_path_planner_ptr(path_planner_ptr),
           m_mpc_time_step(mpc_time_step),
           m_x(x_0),
           m_t(0.0),

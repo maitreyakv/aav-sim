@@ -27,16 +27,9 @@ namespace boost {
 int Simulation::simulate(double time) {
 
     // TEMP
-    std::vector<Obstacle*> obs;
-    arma::vec center_1 = {0.0, 0.0, 0.0};
-    SphereObstacle* sphere_1_ptr = new SphereObstacle(center_1, 0.5, 1.5);
-    obs.push_back(sphere_1_ptr);
-    RRTPathPlanner* path_planner_ptr = new RRTPathPlanner(obs);
     arma::vec pos_start = {this->m_x(0), this->m_x(1), this->m_x(2)};
     arma::vec pos_target = {this->m_x_star(0), this->m_x_star(1), this->m_x_star(2)};
-    std::vector<arma::vec> path = path_planner_ptr->computePath(pos_start, pos_target);
-    delete path_planner_ptr;
-    delete sphere_1_ptr;
+    std::vector<arma::vec> path = this->m_path_planner_ptr->computePath(pos_start, pos_target);
 
     // Generate interpolators for the path, one for each dimension of the path
     std::vector<boost::math::cubic_b_spline<double>> path_interps;
