@@ -108,5 +108,11 @@ int main(int argc, char** argv) {
 
     simulation_ptr->simulate( stod( inputs.get<std::string>("SimulationParameters.sim_time") ) );
 
+    // Deallocate memory
+    delete dynamics_ptr;
+    delete cost_ptr;
+    delete controller_ptr;
+    delete system_ptr;
+
     return 0;
 }
