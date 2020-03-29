@@ -215,9 +215,6 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
             num_backward_pass++;
         } while (num_backward_pass < max_num_backward_pass && !is_Q_uu_reg_positive_definite);
 
-        // TEMP
-        //std::cout << num_backward_pass << std::endl;
-
         // Increase the regularization term
         delta = fmax(delta_0, delta * delta_0);
         mu = fmax(mu_min, mu * delta);
@@ -271,7 +268,6 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
             if ((J_new - J) / delta_J < 0.1
                     || std::isinf(cost_reduction_ratio) || std::isnan(cost_reduction_ratio)) {
                 // Decrease the learning rate
-                // TEMP
                 this->m_learning_rate = this->m_learning_rate * 0.5;
 
                 // Restart the forward pass
@@ -283,20 +279,9 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
 
             // Increment number of forward passes
             num_forward_pass++;
-
-            // TEMP
-            //std::cout << this->m_learning_rate << "," << J_new << "," << J << "," << delta_J << "," << (J_new - J) / delta_J << std::endl;
-
-
         } while (num_forward_pass < max_num_forward_pass && is_restart_forward_pass);
 
         this->m_learning_rate = 1.0;
-
-        // TEMP
-        //std::cout << num_forward_pass << std::endl;
-
-        // TEMP
-        //std::cout << i << "," << J_new << std::endl;
 
         // Copy the updated control into the current nominal control
         u = u_new;
@@ -306,14 +291,6 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
     }
 
     this->m_u_initial = u;
-
-    // TEMP
-    /**
-    for (int k = 0; k < this->m_num_discretization; k++) {
-        std::cout << x[k](0) << "," << x[k](1) << "," << x[k](2) << ",";
-    }
-    std::cout << "end" << std::endl;
-     */
 
     // Return the first control input in the optimal control sequence
     return u[0];
