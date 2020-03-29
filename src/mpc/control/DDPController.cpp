@@ -20,7 +20,7 @@ arma::mat contract_vector_and_tensor(arma::vec vect, arma::cube tens) {
 }
 
 
-// TEMP
+// TEMP:
 const double delta_0 = 2.0;
 const double mu_min = pow(10, -6);
 const int max_num_backward_pass = 10;
@@ -66,6 +66,7 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
             // Create random control vector with elements in the range [0,1]
             arma::vec u_rand = arma::zeros<arma::vec>(dim_u);
             for (int m = 0; m < dim_u; m++) {
+                // TEMP
                 u_rand(m) = 0.0 * rand() / (double) RAND_MAX;
             }
 
@@ -307,10 +308,12 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
     this->m_u_initial = u;
 
     // TEMP
+    /**
     for (int k = 0; k < this->m_num_discretization; k++) {
         std::cout << x[k](0) << "," << x[k](1) << "," << x[k](2) << ",";
     }
     std::cout << "end" << std::endl;
+     */
 
     // Return the first control input in the optimal control sequence
     return u[0];
