@@ -20,8 +20,8 @@ add_executable(aav-sim
         src/mpc/control/DDPController.cpp
         src/mpc/control/DDPController.h
         src/mpc/cost/Cost.h
-        src/mpc/cost/QuadraticObstacleCost.cpp
-        src/mpc/cost/QuadraticObstacleCost.h
+        src/mpc/cost/QuadraticCost.cpp
+        src/mpc/cost/QuadraticCost.h
         src/quadcopter/QuadcopterDynamics.cpp
         src/quadcopter/QuadcopterDynamics.h
         src/simulation/Dynamics.h
