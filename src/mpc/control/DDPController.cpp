@@ -158,31 +158,31 @@ arma::vec DDPController::computeOptimalControl(arma::vec x_0, double t_0, arma::
                          this->m_dynamics_ptr->f_u(x[k], u[k], t[k], dt).t() * V_x[k + 1];
                 Q_xx[k] = this->m_cost_ptr->L_xx(x[k], u[k], dt)
                         + this->m_dynamics_ptr->f_x(x[k], u[k], t[k], dt).t() * V_xx[k + 1]
-                        * this->m_dynamics_ptr->f_x(x[k], u[k], t[k], dt)
-                        + contract_vector_and_tensor(V_x[k+1], this->m_dynamics_ptr->f_xx(x[k], u[k], t[k], dt));
+                        * this->m_dynamics_ptr->f_x(x[k], u[k], t[k], dt);
+                        // + contract_vector_and_tensor(V_x[k+1], this->m_dynamics_ptr->f_xx(x[k], u[k], t[k], dt));
                 Q_uu[k] = this->m_cost_ptr->L_uu(x[k], u[k], dt)
                         + this->m_dynamics_ptr->f_u(x[k], u[k], t[k], dt).t() * V_xx[k + 1]
-                        * this->m_dynamics_ptr->f_u(x[k], u[k], t[k], dt)
-                        + contract_vector_and_tensor(V_x[k+1], this->m_dynamics_ptr->f_uu(x[k], u[k], t[k], dt));
+                        * this->m_dynamics_ptr->f_u(x[k], u[k], t[k], dt);
+                        // + contract_vector_and_tensor(V_x[k+1], this->m_dynamics_ptr->f_uu(x[k], u[k], t[k], dt));
                 //Q_xu[k] = this->m_cost_ptr->L_xu(x[k], u[k], dt)
                 //          + this->m_dynamics_ptr->f_x(x[k], u[k], t[k], dt).t() * V_xx[k + 1]
                 //            * this->m_dynamics_ptr->f_u(x[k], u[k], t[k], dt);
                 Q_ux[k] = this->m_cost_ptr->L_ux(x[k], u[k], dt)
                         + this->m_dynamics_ptr->f_u(x[k], u[k], t[k], dt).t()
-                        * V_xx[k + 1] * this->m_dynamics_ptr->f_x(x[k], u[k], t[k], dt)
-                        + contract_vector_and_tensor(V_x[k+1], this->m_dynamics_ptr->f_ux(x[k], u[k], t[k], dt));
+                        * V_xx[k + 1] * this->m_dynamics_ptr->f_x(x[k], u[k], t[k], dt);
+                        // + contract_vector_and_tensor(V_x[k+1], this->m_dynamics_ptr->f_ux(x[k], u[k], t[k], dt));
 
                 // Compute the regularized state-action value function derivatives
                 Q_uu_reg[k] = this->m_cost_ptr->L_uu(x[k], u[k], dt)
                             + this->m_dynamics_ptr->f_u(x[k], u[k], t[k], dt).t()
                             * (V_xx[k + 1] + mu * arma::eye(dim_x, dim_x))
-                            * this->m_dynamics_ptr->f_u(x[k], u[k], t[k], dt)
-                            + contract_vector_and_tensor(V_x[k+1], this->m_dynamics_ptr->f_uu(x[k], u[k], t[k], dt));
+                            * this->m_dynamics_ptr->f_u(x[k], u[k], t[k], dt);
+                            // + contract_vector_and_tensor(V_x[k+1], this->m_dynamics_ptr->f_uu(x[k], u[k], t[k], dt));
                 Q_ux_reg[k] = this->m_cost_ptr->L_ux(x[k], u[k], dt)
                             + this->m_dynamics_ptr->f_u(x[k], u[k], t[k], dt).t()
                             * (V_xx[k + 1] + mu * arma::eye(dim_x, dim_x))
-                            * this->m_dynamics_ptr->f_x(x[k], u[k], t[k], dt)
-                            + contract_vector_and_tensor(V_x[k+1], this->m_dynamics_ptr->f_ux(x[k], u[k], t[k], dt));
+                            * this->m_dynamics_ptr->f_x(x[k], u[k], t[k], dt);
+                            // + contract_vector_and_tensor(V_x[k+1], this->m_dynamics_ptr->f_ux(x[k], u[k], t[k], dt));
 
                 // Ensure that the regularied Q_uu is numerically symmetric
                 Q_uu_reg[k] = 0.5 * (arma::symmatl(Q_uu_reg[k]) + arma::symmatu(Q_uu_reg[k]));
